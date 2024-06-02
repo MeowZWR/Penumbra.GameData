@@ -105,7 +105,7 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
             }}",
             IdentifierType.Owned => id.HomeWorld.Id != _homeWorld
                 ? $"{id.PlayerName} ({Data.ToWorldName(id.HomeWorld)})的{Data.ToName(id.Kind, id.DataId)}"
-                : $"{id.PlayerName}的{Data.ToName(id.Kind,                                     id.DataId)}",
+                : $"{id.PlayerName}s {Data.ToName(id.Kind,                                     id.DataId)}",
             IdentifierType.Special => ((ScreenActor)id.Index.Index).ToName(),
             IdentifierType.Npc =>
                 id.Index == ushort.MaxValue

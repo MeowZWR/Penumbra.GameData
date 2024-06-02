@@ -5,6 +5,9 @@ namespace Penumbra.GameData.Structs;
 /// <summary> An Image Change entry associates a variant with a specific material, effects and decals. </summary>
 public readonly struct ImcEntry : IEquatable<ImcEntry>
 {
+    public const int    NumAttributes  = 10;
+    public const ushort AttributesMask = (1 << NumAttributes) - 1;
+
     /// <summary> The material to use with this variant. </summary>
     public byte MaterialId { get; init; }
 
@@ -12,6 +15,7 @@ public readonly struct ImcEntry : IEquatable<ImcEntry>
     public byte DecalId { get; init; }
 
     /// <summary> Additional attributes and a sound ID packed. </summary>
+    [JsonIgnore]
     public readonly ushort AttributeAndSound;
 
     /// <summary> An optional VFX to use with this variant. 0 means none. </summary>
@@ -23,15 +27,15 @@ public readonly struct ImcEntry : IEquatable<ImcEntry>
     /// <summary> Additional attributes for this variant. Bit 1-10. </summary>
     public ushort AttributeMask
     {
-        get => (ushort)(AttributeAndSound & 0x3FF);
-        init => AttributeAndSound = (ushort)((AttributeAndSound & ~0x3FF) | (value & 0x3FF));
+        get => (ushort)(AttributeAndSound & AttributesMask);
+        init => AttributeAndSound = (ushort)((AttributeAndSound & ~AttributesMask) | (value & AttributesMask));
     }
 
     /// <summary> An optional sound ID to use with this variant. Bit 11-16. </summary>
     public byte SoundId
     {
-        get => (byte)(AttributeAndSound >> 10);
-        init => AttributeAndSound = (ushort)(AttributeMask | (value << 10));
+        get => (byte)(AttributeAndSound >> NumAttributes);
+        init => AttributeAndSound = (ushort)(AttributeMask | (value << NumAttributes));
     }
 
     /// <inheritdoc/>

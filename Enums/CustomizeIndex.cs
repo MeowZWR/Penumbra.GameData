@@ -112,12 +112,12 @@ public static class CustomizationExtensions
             CustomizeIndex.Hairstyle         => "发型",
             CustomizeIndex.Highlights        => "启用挑染",
             CustomizeIndex.SkinColor         => "肤色",
-            CustomizeIndex.EyeColorRight     => "左眼颜色", // inverted due to compatibility bug.
+            CustomizeIndex.EyeColorRight     => "右眼",
             CustomizeIndex.HairColor         => "发色",
             CustomizeIndex.HighlightsColor   => "挑染颜色",
             CustomizeIndex.TattooColor       => "纹身颜色",
             CustomizeIndex.Eyebrows          => "眉形",
-            CustomizeIndex.EyeColorLeft      => "右眼颜色", // inverted due to compatibility bug.
+            CustomizeIndex.EyeColorLeft      => "左眼",
             CustomizeIndex.EyeShape          => "小瞳孔",
             CustomizeIndex.Nose              => "鼻型",
             CustomizeIndex.Jaw               => "脸部轮廓",
