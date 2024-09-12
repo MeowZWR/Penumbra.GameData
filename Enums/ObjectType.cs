@@ -26,21 +26,21 @@ public static class ObjectTypeExtensions
     public static string ToName(this ObjectType type)
         => type switch
         {
-            ObjectType.Vfx           => "Visual Effect",
-            ObjectType.DemiHuman     => "Demi Human",
-            ObjectType.Accessory     => "Accessory",
-            ObjectType.World         => "Doodad",
-            ObjectType.Housing       => "Housing Object",
-            ObjectType.Monster       => "Monster",
-            ObjectType.Icon          => "Icon",
-            ObjectType.LoadingScreen => "Loading Screen",
-            ObjectType.Map           => "Map",
-            ObjectType.Interface     => "UI Element",
-            ObjectType.Equipment     => "Equipment",
-            ObjectType.Character     => "Character",
-            ObjectType.Weapon        => "Weapon",
-            ObjectType.Font          => "Font",
-            _                        => "Unknown",
+            ObjectType.Vfx           => "视觉效果",
+            ObjectType.DemiHuman     => "蛮族",
+            ObjectType.Accessory     => "配饰",
+            ObjectType.World         => "小物件",
+            ObjectType.Housing       => "装修物品",
+            ObjectType.Monster       => "怪物",
+            ObjectType.Icon          => "图标",
+            ObjectType.LoadingScreen => "加载界面",
+            ObjectType.Map           => "地图",
+            ObjectType.Interface     => "UI元素",
+            ObjectType.Equipment     => "装备",
+            ObjectType.Character     => "角色",
+            ObjectType.Weapon        => "武器",
+            ObjectType.Font          => "字体",
+            _                        => "未知",
         };
 
     /// <summary> A list of valid object types for IMC files. </summary>

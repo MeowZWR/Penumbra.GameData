@@ -90,18 +90,18 @@ public static class CrestExtensions
     public static string ToLabel(this CrestFlag flag)
         => flag switch
         {
-            CrestFlag.Head     => "Head",
-            CrestFlag.Body     => "Chest",
-            CrestFlag.Hands    => "Gauntlets",
-            CrestFlag.Legs     => "Pants",
-            CrestFlag.Feet     => "Boot",
-            CrestFlag.Ears     => "Earrings",
-            CrestFlag.Neck     => "Necklace",
-            CrestFlag.Wrists   => "Bracelet",
-            CrestFlag.RFinger  => "Right Ring",
-            CrestFlag.LFinger  => "Left Ring",
-            CrestFlag.MainHand => "Weapon",
-            CrestFlag.OffHand  => "Shield",
+            CrestFlag.Head     => "头部",
+            CrestFlag.Body     => "身体",
+            CrestFlag.Hands    => "手套",
+            CrestFlag.Legs     => "腿部",
+            CrestFlag.Feet     => "足部",
+            CrestFlag.Ears     => "耳饰",
+            CrestFlag.Neck     => "项链",
+            CrestFlag.Wrists   => "手镯",
+            CrestFlag.RFinger  => "右指",
+            CrestFlag.LFinger  => "左指",
+            CrestFlag.MainHand => "武器",
+            CrestFlag.OffHand  => "盾牌",
             _                  => string.Empty,
         };
 }

@@ -176,49 +176,49 @@ public static class RaceEnumExtensions
     public static string ToName(this Race race)
         => race switch
         {
-            Race.Hyur     => "Hyur",
-            Race.Elezen   => "Elezen",
-            Race.Lalafell => "Lalafell",
-            Race.Miqote   => "Miqo'te",
-            Race.Roegadyn => "Roegadyn",
-            Race.AuRa     => "Au Ra",
-            Race.Hrothgar => "Hrothgar",
-            Race.Viera    => "Viera",
-            _             => "Unknown",
+            Race.Hyur     => "人族",
+            Race.Elezen   => "精灵族",
+            Race.Lalafell => "拉拉菲尔族",
+            Race.Miqote   => "猫魅族",
+            Race.Roegadyn => "鲁加族",
+            Race.AuRa     => "敖龙族",
+            Race.Hrothgar => "硌狮族",
+            Race.Viera    => "维埃拉族",
+            _             => "未知",
         };
 
     /// <summary> Obtain a human-readable name for Gender. </summary>
     public static string ToName(this Gender gender)
         => gender switch
         {
-            Gender.Male      => "Male",
-            Gender.Female    => "Female",
-            Gender.MaleNpc   => "Male (Child)",
-            Gender.FemaleNpc => "Female (Child)",
-            _                => "Unknown",
+            Gender.Male      => "男性",
+            Gender.Female    => "女性",
+            Gender.MaleNpc   => "男性NPC",
+            Gender.FemaleNpc => "女性NPC",
+            _                => "未知",
         };
 
     /// <summary> Obtain a human-readable name for SubRace. </summary>
     public static string ToName(this SubRace subRace)
         => subRace switch
         {
-            SubRace.Midlander       => "Midlander",
-            SubRace.Highlander      => "Highlander",
-            SubRace.Wildwood        => "Wildwood",
-            SubRace.Duskwight       => "Duskwight",
-            SubRace.Plainsfolk      => "Plainsfolk",
-            SubRace.Dunesfolk       => "Dunesfolk",
-            SubRace.SeekerOfTheSun  => "Seeker Of The Sun",
-            SubRace.KeeperOfTheMoon => "Keeper Of The Moon",
-            SubRace.Seawolf         => "Seawolf",
-            SubRace.Hellsguard      => "Hellsguard",
-            SubRace.Raen            => "Raen",
-            SubRace.Xaela           => "Xaela",
-            SubRace.Helion          => "Hellion",
-            SubRace.Lost            => "Lost",
-            SubRace.Rava            => "Rava",
-            SubRace.Veena           => "Veena",
-            _                       => "Unknown",
+            SubRace.Midlander       => "中原之民（人族）",
+            SubRace.Highlander      => "高地之民（人族）",
+            SubRace.Wildwood        => "森林之民（精灵族）",
+            SubRace.Duskwight       => "黑影之民（精灵族）",
+            SubRace.Plainsfolk      => "平原之民（拉拉菲尔族）",
+            SubRace.Dunesfolk       => "沙漠之民（拉拉菲尔族）",
+            SubRace.SeekerOfTheSun  => "逐日之民（猫魅族）",
+            SubRace.KeeperOfTheMoon => "护月之民（猫魅族）",
+            SubRace.Seawolf         => "北洋之民（鲁加族）",
+            SubRace.Hellsguard      => "红焰之民（鲁加族）",
+            SubRace.Raen            => "晨曦之民（敖龙族）",
+            SubRace.Xaela           => "暮晖之民（敖龙族）",
+            SubRace.Helion          => "掠日之民（硌狮族）",
+            SubRace.Lost            => "迷踪之民（硌狮族）",
+            SubRace.Rava            => "密林之民（维埃拉族）",
+            SubRace.Veena           => "山林之民（维埃拉族）",
+            _                       => "未知",
         };
 
     /// <summary> Obtain a combined name for a GenderRace in order {Race} - {Gender}. </summary>
@@ -229,8 +229,8 @@ public static class RaceEnumExtensions
     public static string ToShortName(this SubRace subRace)
         => subRace switch
         {
-            SubRace.SeekerOfTheSun  => "Sunseeker",
-            SubRace.KeeperOfTheMoon => "Moonkeeper",
+            SubRace.SeekerOfTheSun  => "逐日之民",
+            SubRace.KeeperOfTheMoon => "护月之民",
             _                       => subRace.ToName(),
         };
 

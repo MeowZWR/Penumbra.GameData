@@ -1,4 +1,4 @@
-using Penumbra.GameData.Enums;
+﻿using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
@@ -178,14 +178,14 @@ public sealed class ObjectIdentification(
                 switch (info.CustomizationType)
                 {
                     case CustomizationType.Skin:
-                        set[$"Customization: {raceString}{genderString}Skin Textures"] = null;
+                        set[$"外貌：{raceString}{genderString}皮肤纹理"] = null;
                         break;
                     case CustomizationType.DecalFace:
-                        set[$"Customization: Face Decal {info.PrimaryId}"] =
+                        set[$"外貌：Face Decal {info.PrimaryId}"] =
                             IdentifiedCustomization.FacePaint((CustomizeValue)info.PrimaryId.Id);
                         break;
                     case CustomizationType.Iris when race == ModelRace.Unknown:
-                        set["Customization: All Eyes (Catchlight)"] = null;
+                        set["外貌：全部眼睛（反光/Catchlight）"] = null;
                         break;
                     case CustomizationType.DecalEquip:
                         set[$"Equipment Decal {info.PrimaryId}"] = null;
@@ -195,8 +195,8 @@ public sealed class ObjectIdentification(
                         var customizationString = race == ModelRace.Unknown
                          || info.BodySlot == BodySlot.Unknown
                          || info.CustomizationType == CustomizationType.Unknown
-                                ? "Customization: Unknown"
-                                : $"Customization: {race.ToName()} {gender.ToName()} {info.BodySlot} ({info.CustomizationType}) {info.PrimaryId}";
+                                ? "外貌：未知"
+                                : $"外貌：{race.ToName()} {gender.ToName()} {info.BodySlot} ({info.CustomizationType}) {info.PrimaryId}";
                         set[customizationString] = info.BodySlot switch
                         {
                             BodySlot.Hair => IdentifiedCustomization.Hair(race, gender, (CustomizeValue)info.PrimaryId.Id),
