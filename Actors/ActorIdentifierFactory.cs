@@ -30,7 +30,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     {
         using var tt   = ImRaii.Tooltip();
         using var font = ImRaii.PushFont(UiBuilder.MonoFont);
-        ImGui.TextUnformatted("Valid formats for an Identifier String are:");
+        ImGui.TextUnformatted("标识符字符串的有效格式为：");
 
         const uint typeColor    = 0xFF40FF40;
         const uint nameColor    = 0xFF00D0D0;
@@ -41,16 +41,16 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("P", typeColor), (" | ", keyColor), ("[Player Name]@<World Name>", nameColor));
+        ImGuiUtil.DrawColoredText(("P", typeColor), (" | ", keyColor), ("[玩家名称]@<服务器名称>", nameColor));
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("R", typeColor), (" | ", keyColor), ("[Retainer Name]", nameColor));
+        ImGuiUtil.DrawColoredText(("R", typeColor), (" | ", keyColor), ("[雇员名称]", nameColor));
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("N", typeColor), (" | ", keyColor), ("[NPC Type]", npcTypeColor), (" : ", keyColor),
-            ("[Npc Name]", npcNameColor));
+        ImGuiUtil.DrawColoredText(("N", typeColor), (" | ", keyColor), ("[NPC类型]", npcTypeColor), (" : ", keyColor),
+            ("[NPC名称]", npcNameColor));
         if (withIndex)
         {
             ImGui.SameLine(0, 0);
@@ -59,40 +59,40 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("All [] or <> brackets are not to be included but are for placeholders, all", 0),
-            (" bright blue key symbols", keyColor), (" are relevant.", 0));
+        ImGuiUtil.DrawColoredText(("所有的 [] 或 <> 这样的括号只是占位符不需要输入，所有的", 0),
+            ("亮蓝色符号", keyColor), ("必须使用。", 0));
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("O", typeColor), (" | ", keyColor), ("[NPC Type]", npcTypeColor), (" : ", keyColor),
-            ("[Npc Name]", npcNameColor), (" | ", keyColor), ("[Player Name]@<World Name>", nameColor));
-
-        ImGui.NewLine();
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[P]", typeColor), ("layer, ", 0), ("[R]", typeColor), ("etainer, ", 0), ("[N]", typeColor), ("PC, or ", 0),
-            ("[O]", typeColor), ("wned describe the identifier type.", 0));
+        ImGuiUtil.DrawColoredText(("O", typeColor), (" | ", keyColor), ("[NPC类型]", npcTypeColor), (" : ", keyColor),
+            ("[NPC名称]", npcNameColor), (" | ", keyColor), ("[玩家名称]@<服务器名称>", nameColor));
 
         ImGui.NewLine();
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[Player Name]", nameColor), (" and ", 0), ("[Retainer Name]", nameColor),
-            (" must agree with naming rules.", 0));
+        ImGuiUtil.DrawColoredText(("[P]", typeColor), ("玩家，", 0), ("[R]", typeColor), ("雇员，", 0), ("[N]", typeColor), ("NPC或", 0),
+            ("[O]", typeColor), ("从属的描述标识符类型", 0));
+
+        ImGui.NewLine();
+        ImGui.Bullet();
+        ImGui.SameLine();
+        ImGuiUtil.DrawColoredText(("[玩家名称]", nameColor), ("和", 0), ("[雇员名称]", nameColor),
+            ("必须符合命名规则。", 0));
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("<World Name>", nameColor), (" is optional (", 0), ("Any World", nameColor),
-            (" when not provided), but must be a valid world otherwise.", 0));
+        ImGuiUtil.DrawColoredText(("<服务器名称>", nameColor), ("是可填项（如果不提供则代表", 0), ("任意服务器", nameColor),
+            ("），填写则必须是有效服务器名称。", 0));
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[NPC Type]", npcTypeColor), (" can be ", 0), ("[M]", npcTypeColor), ("ount, ", 0), ("[C]", npcTypeColor),
-            ("ompanion, ", 0), ("[A]", npcTypeColor), ("ccessory, ", 0), ("[E]", npcTypeColor), ("vent NPC, or", 0), ("[B]", npcTypeColor),
-            ("attle NPC.", 0));
+        ImGuiUtil.DrawColoredText(("[NPC类型]", npcTypeColor), ("可以是", 0), ("[M]", npcTypeColor), ("坐骑，", 0), ("[C]", npcTypeColor),
+            ("宠物，", 0), ("[A]", npcTypeColor), ("时尚佩饰，", 0), ("[E]", npcTypeColor), ("事件NPC或", 0), ("[B]", npcTypeColor),
+            ("战斗NPC", 0));
 
         ImGui.Bullet();
         ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[NPC Name]", npcNameColor), (" must be a valid, known NPC name for the chosen type.", 0));
+        ImGuiUtil.DrawColoredText(("[NPC名称]", npcNameColor), ("必须是符合所选类型且有效已知的名称", 0));
 
         if (withIndex)
         {
@@ -120,7 +120,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     public ActorIdentifier[] FromUserString(string userString, bool allowIndex)
     {
         if (userString.Length == 0)
-            throw new IdentifierParseError("The identifier string was empty.");
+            throw new IdentifierParseError("标识符字符串为空。");
 
         var split = userString.Split('|', 3, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (split.Length < 2)
@@ -138,9 +138,9 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             case "retainer":
             {
                 if (!VerifyRetainerName(split[1]))
-                    throw new IdentifierParseError($"{split[1]} is not a valid player name.");
+                    throw new IdentifierParseError($"{split[1]} 不是有效的玩家名称。");
                 if (!ByteString.FromString(split[1], out var playerName))
-                    throw new IdentifierParseError($"The retainer string {split[1]} contains invalid symbols.");
+                    throw new IdentifierParseError($"雇员字符串 {split[1]} 包含无效符号。");
 
                 return [CreateIndividualUnchecked(IdentifierType.Retainer, playerName, 0, 0, 0)];
             }
@@ -288,101 +288,28 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<byte> name)
     {
-        // Total no more than 20 characters + space.
-        if (name.Length is < 5 or > 21)
-            return false;
-
-        // Forename and surname, no more spaces.
-        var splitIndex = name.IndexOf((byte)' ');
-        if (splitIndex < 0 || name[(splitIndex + 1)..].IndexOf((byte)' ') >= 0)
-            return false;
-
-        return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
+        if (name.Length == 0) return false;
+        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name);
     }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<char> name)
     {
-        // Total no more than 20 characters + space.
-        if (name.Length is < 5 or > 21)
-            return false;
-
-        // Forename and surname, no more spaces.
-        var splitIndex = name.IndexOf(' ');
-        if (splitIndex < 0 || name[(splitIndex + 1)..].IndexOf(' ') >= 0)
-            return false;
-
-        return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
+        if (name.Length == 0) return false;
+        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name.ToString());
     }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<byte> name)
-        => CheckNamePart(name, 3, 20);
-
+    {
+        if (name.Length == 0) return false;
+        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name);
+    }
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<char> name)
-        => CheckNamePart(name, 3, 20);
-
-    /// <summary> Checks a single part of a name. </summary>
-    private static bool CheckNamePart(ReadOnlySpan<char> part, int minLength, int maxLength)
     {
-        // Each name part at least 2 and at most 15 characters for players, and at least 3 and at most 20 characters for retainers.
-        if (part.Length < minLength || part.Length > maxLength)
-            return false;
-
-        // Each part starting with capitalized letter.
-        if (part[0] is < 'A' or > 'Z')
-            return false;
-
-        // Every other symbol needs to be lowercase letter, hyphen or apostrophe.
-        var last = '\0';
-        for (var i = 1; i < part.Length; ++i)
-        {
-            var current = part[i];
-            if (current is not ('\'' or '-' or (>= 'a' and <= 'z')))
-                return false;
-
-            // Hyphens can not be used in succession, after or before apostrophes or as the last symbol.
-            if (last is '\'' && current is '-')
-                return false;
-            if (last is '-' && current is '-' or '\'')
-                return false;
-
-            last = current;
-        }
-
-        return true;
-    }
-
-    /// <summary> Checks a single part of a name. </summary>
-    private static bool CheckNamePart(ReadOnlySpan<byte> part, int minLength, int maxLength)
-    {
-        // Each name part at least 2 and at most 15 characters for players, and at least 3 and at most 20 characters for retainers.
-        if (part.Length < minLength || part.Length > maxLength)
-            return false;
-
-        // Each part starting with capitalized letter.
-        if (part[0] is < (byte)'A' or > (byte)'Z')
-            return false;
-
-        // Every other symbol needs to be lowercase letter, hyphen or apostrophe.
-        var last = (byte)'\0';
-        for (var i = 1; i < part.Length; ++i)
-        {
-            var current = part[i];
-            if (current is not ((byte)'\'' or (byte)'-' or (>= (byte)'a' and <= (byte)'z')))
-                return false;
-
-            // Hyphens can not be used in succession, after or before apostrophes or as the last symbol.
-            if (last is (byte)'\'' && current is (byte)'-')
-                return false;
-            if (last is (byte)'-' && current is (byte)'-' or (byte)'\'')
-                return false;
-
-            last = current;
-        }
-
-        return true;
+        if (name.Length == 0) return false;
+        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name.ToString());
     }
 
     /// <summary> Checks if the world is a valid public world or ushort.MaxValue (any world). </summary>

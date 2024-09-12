@@ -38,12 +38,12 @@ public static class ActorIdentifierExtensions
     public static string ToName(this ObjectKind kind)
         => kind switch
         {
-            ObjectKind.None      => "Unknown",
-            ObjectKind.BattleNpc => "Battle NPC",
-            ObjectKind.EventNpc  => "Event NPC",
-            ObjectKind.MountType => "Mount",
-            ObjectKind.Companion => "Companion",
-            ObjectKind.Ornament  => "Accessory",
+            ObjectKind.None      => "未知",
+            ObjectKind.BattleNpc => "战斗NPC",
+            ObjectKind.EventNpc  => "事件NPC",
+            ObjectKind.MountType => "坐骑",
+            ObjectKind.Companion => "宠物",
+            ObjectKind.Ornament  => "时尚配饰",
             _                    => kind.ToString(),
         };
 
@@ -51,13 +51,13 @@ public static class ActorIdentifierExtensions
     public static string ToName(this IdentifierType type)
         => type switch
         {
-            IdentifierType.Player    => "Player",
-            IdentifierType.Retainer  => "Retainer (Bell)",
-            IdentifierType.Owned     => "Owned NPC",
-            IdentifierType.Special   => "Special Actor",
+            IdentifierType.Player    => "玩家",
+            IdentifierType.Retainer  => "雇员（传唤铃）",
+            IdentifierType.Owned     => "所属NPC",
+            IdentifierType.Special   => "特殊参与者",
             IdentifierType.Npc       => "NPC",
-            IdentifierType.UnkObject => "Unknown Object",
-            _                        => "Invalid",
+            IdentifierType.UnkObject => "未知对象",
+            _                        => "无效",
         };
 
     /// <summary> Get the display name for special actors. </summary>

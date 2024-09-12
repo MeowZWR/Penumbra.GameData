@@ -99,9 +99,9 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
                 : id.PlayerName.ToString(),
             IdentifierType.Retainer => $"{id.PlayerName}{id.Retainer switch
             {
-                ActorIdentifier.RetainerType.Bell      => " (Bell)",
-                ActorIdentifier.RetainerType.Mannequin => " (Mannequin)",
-                _                                      => " (Retainer)",
+                ActorIdentifier.RetainerType.Bell      => " (传唤铃雇员)",
+                ActorIdentifier.RetainerType.Mannequin => " (服装模特)",
+                _                                      => " (雇员)",
             }}",
             IdentifierType.Owned => id.HomeWorld.Id != _homeWorld
                 ? $"{id.PlayerName} ({Data.ToWorldName(id.HomeWorld)})'s {Data.ToName(id.Kind, id.DataId)}"

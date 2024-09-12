@@ -134,9 +134,9 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
                 IdentifierType.Retainer =>
                     $"{PlayerName}{Retainer switch
                     {
-                        RetainerType.Bell      => " (Bell)",
-                        RetainerType.Mannequin => " (Mannequin)",
-                        _                      => " (Retainer)",
+                        RetainerType.Bell      => " (传唤铃雇员)",
+                        RetainerType.Mannequin => " (服装模特)",
+                        _                      => " (雇员)",
                     }}",
                 IdentifierType.Owned   => $"{PlayerName}s {Kind.ToName()} {DataId} ({HomeWorld})",
                 IdentifierType.Special => ((ScreenActor)Index.Index).ToName(),
@@ -145,9 +145,9 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
                         ? $"{Kind.ToName()} #{DataId}"
                         : $"{Kind.ToName()} #{DataId} at {Index}",
                 IdentifierType.UnkObject => PlayerName.IsEmpty
-                    ? $"Unknown Object at {Index}"
+                    ? $"未知对象 at {Index}"
                     : $"{PlayerName} at {Index}",
-                _ => "Invalid",
+                _ => "无效",
             };
 
     /// <summary> Obtain only the name of the actor identified. </summary>
