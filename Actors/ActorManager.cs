@@ -92,6 +92,10 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
     /// <summary> Use stored data to convert an ActorIdentifier to a string with more accurate data. </summary>
     public string ToString(ActorIdentifier id)
     {
+        // 检查是否包含中文字符
+        bool containsChinese = id.PlayerName.Any(c => ((int)c >= 0x4e00 && (int)c <= 0x9fff));
+        string possessive = containsChinese ? "的" : "'s ";
+
         return id.Type switch
         {
             IdentifierType.Player => id.HomeWorld.Id != _homeWorld
@@ -104,8 +108,8 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
                 _                                      => " (雇员)",
             }}",
             IdentifierType.Owned => id.HomeWorld.Id != _homeWorld
-                ? $"{id.PlayerName} ({Data.ToWorldName(id.HomeWorld)})'s {Data.ToName(id.Kind, id.DataId)}"
-                : $"{id.PlayerName}s {Data.ToName(id.Kind,                                     id.DataId)}",
+                ? $"{id.PlayerName} ({Data.ToWorldName(id.HomeWorld)}){possessive}{Data.ToName(id.Kind, id.DataId)}"
+                : $"{id.PlayerName}{possessive}{Data.ToName(id.Kind, id.DataId)}",
             IdentifierType.Special => ((ScreenActor)id.Index.Index).ToName(),
             IdentifierType.Npc =>
                 id.Index == ushort.MaxValue
@@ -121,11 +125,15 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
     /// <summary> Use stored data to convert an ActorIdentifier to a name only. </summary>
     public string ToName(ActorIdentifier id)
     {
+        // 检查是否包含中文字符
+        bool containsChinese = id.PlayerName.Any(c => ((int)c >= 0x4e00 && (int)c <= 0x9fff));
+        string possessive = containsChinese ? "的" : "'s ";
+
         return id.Type switch
         {
             IdentifierType.Player    => id.PlayerName.ToString(),
             IdentifierType.Retainer  => id.PlayerName.ToString(),
-            IdentifierType.Owned     => $"{id.PlayerName}s {Data.ToName(id.Kind, id.DataId)}",
+            IdentifierType.Owned     => $"{id.PlayerName}{possessive}{Data.ToName(id.Kind, id.DataId)}",
             IdentifierType.Special   => ((ScreenActor)id.Index.Index).ToName(),
             IdentifierType.Npc       => Data.ToName(id.Kind, id.DataId),
             IdentifierType.UnkObject => id.PlayerName.IsEmpty ? id.PlayerName.ToString() : "Unknown Object",

@@ -102,53 +102,87 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
     public string Incognito(string? name)
     {
         name ??= ToString();
-        switch (Type)
+
+        bool containsChinese = name.Any(c => (c >= 0x4e00 && c <= 0x9fff)); // 检查是否包含中文字符
+
+        if (containsChinese)
         {
-            case IdentifierType.Player:
+            // 处理中文名字匿名
+            switch (Type)
             {
-                var parts = name.Split(' ', 3);
-                return parts.Length == 2 ? $"{parts[0][0]}. {parts[1][0]}." : $"{parts[0][0]}. {parts[1][0]}. {parts[2]}";
-            }
-            case IdentifierType.Owned:
-            {
-                var parts = name.Split(' ', 3);
-                return parts[2][0] == '(' ? $"{parts[0][0]}. {parts[1][0]}. {parts[2]}" : $"{parts[0][0]}. {parts[1][0]}.'s {parts[2]}";
-            }
-            case IdentifierType.Retainer:
-            {
-                var parts = name.Split(' ', 2);
-                return $"{parts[0][0]}. {parts[1]}";
+                case IdentifierType.Player:
+                    {
+                        var parts = name.Split(' ', 2);
+                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*{parts[1]}";
+                    }
+                case IdentifierType.Owned:
+                    {
+                        var parts = name.Split('的', 2);
+                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*的{parts[1]}";
+                    }
+                case IdentifierType.Retainer:
+                    {
+                        var parts = name.Split(' ', 2);
+                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*{parts[1]}";
+                    }
             }
         }
-
+        else
+        {
+            // 处理英文名字匿名
+            switch (Type)
+            {
+                case IdentifierType.Player:
+                    {
+                        var parts = name.Split(' ', 3);
+                        return parts.Length == 2 ? $"{parts[0][0]}. {parts[1][0]}." : $"{parts[0][0]}. {parts[1][0]}. {parts[2]}";
+                    }
+                case IdentifierType.Owned:
+                    {
+                        var parts = name.Split(' ', 3);
+                        return parts[2][0] == '(' ? $"{parts[0][0]}. {parts[1][0]}. {parts[2]}" : $"{parts[0][0]}. {parts[1][0]}.'s {parts[2]}";
+                    }
+                case IdentifierType.Retainer:
+                    {
+                        var parts = name.Split(' ', 2);
+                        return $"{parts[0][0]}. {parts[1]}";
+                    }
+            }
+        }
         return name;
     }
 
     /// <summary> Convert an identifier to a human-readable string. </summary>
     /// <remarks> This uses the statically set actor manager if it is available, to obtain even better names. </remarks>
     public override string ToString()
-        => ActorIdentifierExtensions.Manager?.ToString(this)
-         ?? Type switch
-            {
-                IdentifierType.Player => $"{PlayerName} ({HomeWorld})",
-                IdentifierType.Retainer =>
-                    $"{PlayerName}{Retainer switch
-                    {
-                        RetainerType.Bell      => " (传唤铃雇员)",
-                        RetainerType.Mannequin => " (服装模特)",
-                        _                      => " (雇员)",
-                    }}",
-                IdentifierType.Owned   => $"{PlayerName}s {Kind.ToName()} {DataId} ({HomeWorld})",
-                IdentifierType.Special => ((ScreenActor)Index.Index).ToName(),
-                IdentifierType.Npc =>
-                    Index == ushort.MaxValue
-                        ? $"{Kind.ToName()} #{DataId}"
-                        : $"{Kind.ToName()} #{DataId} at {Index}",
-                IdentifierType.UnkObject => PlayerName.IsEmpty
-                    ? $"未知对象 at {Index}"
-                    : $"{PlayerName} at {Index}",
-                _ => "无效",
-            };
+    {
+        // 检查是否包含中文字符
+        bool containsChinese = PlayerName.Any(c => ((int)c >= 0x4e00 && (int)c <= 0x9fff));
+        string possessive = containsChinese ? "的" : "'s ";
+
+        return ActorIdentifierExtensions.Manager?.ToString(this)
+             ?? Type switch
+             {
+                 IdentifierType.Player => $"{PlayerName} ({HomeWorld})",
+                 IdentifierType.Retainer =>
+                     $"{PlayerName}{Retainer switch
+                     {
+                         RetainerType.Bell => " (传唤铃雇员)",
+                         RetainerType.Mannequin => " (服装模特)",
+                         _ => " (雇员)",
+                     }}",
+                 IdentifierType.Owned => $"{PlayerName}{possessive}{Kind.ToName()} {DataId} ({HomeWorld})",
+                 IdentifierType.Special => ((ScreenActor)Index.Index).ToName(),
+                 IdentifierType.Npc =>
+                     Index == ushort.MaxValue
+                         ? $"{Kind.ToName()} #{DataId}"
+                         : $"{Kind.ToName()} #{DataId} at {Index}",
+                 IdentifierType.UnkObject => PlayerName.IsEmpty
+                     ? $"未知对象 at {Index}"
+                     : $"{PlayerName} at {Index}",
+                 _ => "无效",
+             };
+    }
 
     /// <summary> Obtain only the name of the actor identified. </summary>
     /// <remarks> This uses the statically set actor manager if it is available to obtain the name. </remarks>
