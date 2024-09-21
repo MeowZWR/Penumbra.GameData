@@ -1,3 +1,4 @@
+using System.Linq;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
@@ -103,31 +104,10 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
     {
         name ??= ToString();
 
-        bool containsChinese = name.Any(c => (c >= 0x4e00 && c <= 0x9fff)); // 检查是否包含中文字符
+        // 判断是否包含空格来区分英文名和中文名
+        bool containsSpace = name.Contains(' ');
 
-        if (containsChinese)
-        {
-            // 处理中文名字匿名
-            switch (Type)
-            {
-                case IdentifierType.Player:
-                    {
-                        var parts = name.Split(' ', 2);
-                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*{parts[1]}";
-                    }
-                case IdentifierType.Owned:
-                    {
-                        var parts = name.Split('的', 2);
-                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*的{parts[1]}";
-                    }
-                case IdentifierType.Retainer:
-                    {
-                        var parts = name.Split(' ', 2);
-                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*{parts[1]}";
-                    }
-            }
-        }
-        else
+        if (containsSpace)
         {
             // 处理英文名字匿名
             switch (Type)
@@ -149,16 +129,39 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
                     }
             }
         }
+        else
+        {
+            // 处理中文名字匿名
+            switch (Type)
+            {
+                case IdentifierType.Player:
+                    {
+                        var parts = name.Split(' ', 2);
+                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*{parts[1]}";
+                    }
+                case IdentifierType.Owned:
+                    {
+                        var parts = name.Split('的', 2);
+                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*的{parts[1]}";
+                    }
+                case IdentifierType.Retainer:
+                    {
+                        var parts = name.Split(' ', 2);
+                        return parts.Length == 1 ? $"{parts[0][0]}*" : $"{parts[0][0]}*{parts[1]}";
+                    }
+            }
+        }
+
         return name;
     }
+
 
     /// <summary> Convert an identifier to a human-readable string. </summary>
     /// <remarks> This uses the statically set actor manager if it is available, to obtain even better names. </remarks>
     public override string ToString()
     {
-        // 检查是否包含中文字符
-        bool containsChinese = PlayerName.Any(c => ((int)c >= 0x4e00 && (int)c <= 0x9fff));
-        string possessive = containsChinese ? "的" : "'s ";
+        // 检查玩家名称 ByteString 转换为 string 后是否包含空格
+        string possessive = PlayerName.ToString().Contains(' ') ? "'s " : "的";
 
         return ActorIdentifierExtensions.Manager?.ToString(this)
              ?? Type switch

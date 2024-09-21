@@ -92,9 +92,8 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
     /// <summary> Use stored data to convert an ActorIdentifier to a string with more accurate data. </summary>
     public string ToString(ActorIdentifier id)
     {
-        // 检查是否包含中文字符
-        bool containsChinese = id.PlayerName.Any(c => ((int)c >= 0x4e00 && (int)c <= 0x9fff));
-        string possessive = containsChinese ? "的" : "'s ";
+        // 检查玩家名称 ByteString 转换为 string 后是否包含空格
+        string possessive = id.PlayerName.ToString().Contains(' ') ? "'s " : "的";
 
         return id.Type switch
         {
@@ -125,9 +124,8 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
     /// <summary> Use stored data to convert an ActorIdentifier to a name only. </summary>
     public string ToName(ActorIdentifier id)
     {
-        // 检查是否包含中文字符
-        bool containsChinese = id.PlayerName.Any(c => ((int)c >= 0x4e00 && (int)c <= 0x9fff));
-        string possessive = containsChinese ? "的" : "'s ";
+        // 检查玩家名称 ByteString 转换为 string 后是否包含空格
+        string possessive = id.PlayerName.ToString().Contains(' ') ? "'s " : "的";
 
         return id.Type switch
         {
