@@ -1,4 +1,3 @@
-using System.Linq;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;

@@ -288,28 +288,125 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<byte> name)
     {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name);
+        return name.Contains((byte)' ') ? VerifyEnglishPlayerName(name) : VerifyChinesePlayerName(name);
     }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<char> name)
     {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name.ToString());
+        return name.Contains(' ') ? VerifyEnglishPlayerName(name) : VerifyChinesePlayerName(name);
     }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<byte> name)
     {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name);
+        return name.Contains((byte)' ') ? VerifyEnglishPlayerName(name) : VerifyChinesePlayerName(name);
     }
+
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<char> name)
     {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name.ToString());
+        return name.Contains(' ') ? VerifyEnglishPlayerName(name) : VerifyChinesePlayerName(name);
+    }
+
+    /// <summary> 以国服规则校验昵称Byte </summary>
+    private static bool VerifyChinesePlayerName(ReadOnlySpan<byte> nickName)
+    {
+        string nickNamePatt_CN = @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFFA\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
+        string nickNameStr = Encoding.UTF8.GetString(nickName);
+        return Regex.IsMatch(nickNameStr, nickNamePatt_CN);
+    }
+
+    /// <summary> 以国服规则校验昵称Char </summary>
+    private static bool VerifyChinesePlayerName(ReadOnlySpan<char> nickName)
+    {
+        string nickNamePatt_CN = @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFFA\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
+        string nickNameStr = nickName.ToString();
+        return Regex.IsMatch(nickNameStr, nickNamePatt_CN);
+    }
+
+    /// <summary> Checks SE naming rules for English names. </summary>
+    private static bool VerifyEnglishPlayerName(ReadOnlySpan<byte> name)
+    {
+        // Total no more than 20 characters + space.
+        if (name.Length is < 5 or > 21)
+            return false;
+
+        // Forename and surname, no more spaces.
+        var splitIndex = name.IndexOf((byte)' ');
+        if (splitIndex < 0 || name[(splitIndex + 1)..].IndexOf((byte)' ') >= 0)
+            return false;
+
+        return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
+    }
+
+    /// <summary> Checks SE naming rules for English names. </summary>
+    private static bool VerifyEnglishPlayerName(ReadOnlySpan<char> name)
+    {
+        // Total no more than 20 characters + space.
+        if (name.Length is < 5 or > 21)
+            return false;
+
+        // Forename and surname, no more spaces.
+        var splitIndex = name.IndexOf(' ');
+        if (splitIndex < 0 || name[(splitIndex + 1)..].IndexOf(' ') >= 0)
+            return false;
+
+        return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
+    }
+
+    /// <summary> Checks a single part of a name. </summary>
+    private static bool CheckNamePart(ReadOnlySpan<char> part, int minLength, int maxLength)
+    {
+        if (part.Length < minLength || part.Length > maxLength)
+            return false;
+
+        if (part[0] is < 'A' or > 'Z')
+            return false;
+
+        var last = '\0';
+        for (var i = 1; i < part.Length; ++i)
+        {
+            var current = part[i];
+            if (current is not ('\'' or '-' or (>= 'a' and <= 'z')))
+                return false;
+
+            if (last is '\'' && current is '-')
+                return false;
+            if (last is '-' && current is '-' or '\'')
+                return false;
+
+            last = current;
+        }
+
+        return true;
+    }
+
+    /// <summary> Checks a single part of a name. </summary>
+    private static bool CheckNamePart(ReadOnlySpan<byte> part, int minLength, int maxLength)
+    {
+        if (part.Length < minLength || part.Length > maxLength)
+            return false;
+
+        if (part[0] is < (byte)'A' or > (byte)'Z')
+            return false;
+
+        var last = (byte)'\0';
+        for (var i = 1; i < part.Length; ++i)
+        {
+            var current = part[i];
+            if (current is not ((byte)'\'' or (byte)'-' or (>= (byte)'a' and <= (byte)'z')))
+                return false;
+
+            if (last is (byte)'\'' && current is (byte)'-')
+                return false;
+            if (last is (byte)'-' && current is (byte)'-' or (byte)'\'')
+                return false;
+
+            last = current;
+        }
+
+        return true;
     }
 
     /// <summary> Checks if the world is a valid public world or ushort.MaxValue (any world). </summary>
