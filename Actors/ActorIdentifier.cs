@@ -165,15 +165,15 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
         return ActorIdentifierExtensions.Manager?.ToString(this)
              ?? Type switch
              {
-                 IdentifierType.Player => $"{PlayerName} ({HomeWorld})",
+                 IdentifierType.Player => $"{PlayerName}（{HomeWorld}）",
                  IdentifierType.Retainer =>
                      $"{PlayerName}{Retainer switch
                      {
-                         RetainerType.Bell => " (传唤铃雇员)",
-                         RetainerType.Mannequin => " (服装模特)",
-                         _ => " (雇员)",
+                         RetainerType.Bell => "（传唤铃雇员）",
+                         RetainerType.Mannequin => "（服装模特）",
+                         _ => "（雇员）",
                      }}",
-                 IdentifierType.Owned => $"{PlayerName}{possessive}{Kind.ToName()} {DataId} ({HomeWorld})",
+                 IdentifierType.Owned => $"{PlayerName}{possessive}{Kind.ToName()} {DataId}（{HomeWorld}）",
                  IdentifierType.Special => ((ScreenActor)Index.Index).ToName(),
                  IdentifierType.Npc =>
                      Index == ushort.MaxValue
