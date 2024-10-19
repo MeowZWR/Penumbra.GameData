@@ -231,7 +231,7 @@ public readonly struct EquipItem : IEquatable<EquipItem>
     public override int GetHashCode()
         => Id.Id.GetHashCode();
 
-    public const string Nothing = "Nothing";
+    public const string Nothing = "无";
 
     /// <summary> An empty bonus item for a specific slot. </summary>
     public static EquipItem BonusItemNothing(BonusItemFlag slot)
