@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+ï»¿using Newtonsoft.Json;
 
 namespace Penumbra.GameData.Structs;
 
@@ -162,9 +162,9 @@ public readonly struct GmpEntry : IEquatable<GmpEntry>
         if (rotA != 0 || rotB != 0 || rotC != 0)
             sb.Append(", Rotation (")
                 .Append(rotA)
-                .Append("°, ")
+                .Append("Â°, ")
                 .Append(rotB)
-                .Append("°, ")
+                .Append("Â°, ")
                 .Append(rotC)
                 .Append(')');
 

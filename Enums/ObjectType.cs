@@ -27,7 +27,7 @@ public static class ObjectTypeExtensions
         => type switch
         {
             ObjectType.Vfx           => "视觉效果",
-            ObjectType.DemiHuman     => "蛮族",
+            ObjectType.DemiHuman     => "亚人",
             ObjectType.Accessory     => "配饰",
             ObjectType.World         => "小物件",
             ObjectType.Housing       => "装修物品",
