@@ -1,4 +1,4 @@
-using ImGuiNET;
+﻿using ImGuiNET;
 using OtterGui.Log;
 using OtterGui.Widgets;
 using Penumbra.GameData.DataContainers;
@@ -10,7 +10,7 @@ namespace Penumbra.GameData.Gui;
 public sealed class WorldCombo : FilterComboCache<KeyValuePair<WorldId, string>>
 {
     /// <summary> Always the first entry that can be selected. </summary>
-    private const string AnyWorldString = "Any World";
+    private const string AnyWorldString = "任意世界";
 
     /// <summary> Create a new WorldCombo. </summary>
     /// <param name="worlds"> The dictionary of worlds. </param>
