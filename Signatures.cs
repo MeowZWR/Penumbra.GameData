@@ -133,4 +133,7 @@ public static class Sigs
     public const string LoadMotionPacks                        = "E8 ?? ?? ?? 00 48 8B 44 24 ?? 49 89 04 24";
     public const string LoadMotionPacks2                       = "E8 ?? ?? ?? 00 48 8B 44 24 ?? 48 89 03";
     public const string LoadMigratoryMotionPack                = "E9 ?? ?? ?? 00 8B 84 24 ?? ?? 00 00 48 8D";
+
+    //Glamourer custom test
+    public const string GlamourerOrnamentSig = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 49 8B E8";
 }
