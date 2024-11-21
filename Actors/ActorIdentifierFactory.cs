@@ -289,27 +289,27 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     public static bool VerifyPlayerName(ReadOnlySpan<byte> name)
     {
         if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name);
+        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name);
     }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<char> name)
     {
         if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name.ToString());
+        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name.ToString());
     }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<byte> name)
     {
         if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name);
+        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name);
     }
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<char> name)
     {
         if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIModule.IsPlayerCharacterName(name.ToString());
+        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name.ToString());
     }
 
     /// <summary> Checks if the world is a valid public world or ushort.MaxValue (any world). </summary>
