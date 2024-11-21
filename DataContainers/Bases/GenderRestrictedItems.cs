@@ -1,6 +1,6 @@
 using Dalamud.Utility;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using OtterGui.Log;
 using Penumbra.GameData.Enums;
 
@@ -17,13 +17,13 @@ public static class GenderRestrictedItems
     internal static void AddUnknownItems(Dictionary<uint, uint> dict, ExcelSheet<Item> items, Logger log, byte restriction)
     {
         var unhandled = 0;
-        foreach (var item in items.Where(i => i.EquipRestriction == restriction))
+        foreach (var item in items.Where(i => i.EquipRestriction == restriction && i.EquipSlotCategory.RowId > 0))
         {
             // Skip Scion Chronocler's Ringbands and Scion Thaumaturge's Moccasins as they are not actually restricted.
             if (item.RowId is 13700 or 13699)
                 continue;
 
-            var value = (uint)item.ModelMain | ((uint)((EquipSlot)item.EquipSlotCategory.Row).ToSlot() << 24);
+            var value = (uint)item.ModelMain | ((uint)((EquipSlot)item.EquipSlotCategory.RowId).ToSlot() << 24);
             if (dict.ContainsKey(value) || KnownItems.Any(restriction == 2 ? (i => i.MaleId == item.RowId) : (i => i.FemaleId == item.RowId)))
                 continue;
 
@@ -31,7 +31,7 @@ public static class GenderRestrictedItems
             AddEmperor(item);
 
             log.Warning(
-                $"{item.RowId:D5} {item.Name.ToDalamudString().TextValue} is restricted to {(restriction == 2 ? "male" : "female")} characters but is not known, redirected to Emperor.");
+                $"{item.RowId:D5} {item.Name.ExtractText()} is restricted to {(restriction == 2 ? "male" : "female")} characters but is not known, redirected to Emperor. {item.EquipSlotCategory.RowId}");
         }
 
         if (unhandled > 0)
@@ -42,7 +42,7 @@ public static class GenderRestrictedItems
         // Add a redirection to emperors gear for unknown items.
         void AddEmperor(Item item)
         {
-            var slot = ((EquipSlot)item.EquipSlotCategory.Row).ToSlot();
+            var slot = ((EquipSlot)item.EquipSlotCategory.RowId).ToSlot();
             var emperor = ((uint)slot << 24)
               | slot switch
               {
@@ -84,9 +84,7 @@ public static class GenderRestrictedItems
 
         // Get the direction.
         var (source, target, restriction) = direction == 1 ? (pair.MaleId, pair.FemaleId, 2) : (pair.FemaleId, pair.MaleId, 3);
-        var sourceRow = items.GetRow(source);
-        var targetRow = items.GetRow(target);
-        if (sourceRow == null || targetRow == null)
+        if (!items.TryGetRow(source, out var sourceRow) || !items.TryGetRow(target, out var targetRow))
         {
             log.Warning($"Could not add item pair [{pair.MaleId}, {pair.FemaleId}] to restricted items.");
             return;
@@ -94,21 +92,21 @@ public static class GenderRestrictedItems
 
         if (sourceRow.EquipRestriction != restriction)
         {
-            log.Warning($"{sourceRow.Name.ToDalamudString().TextValue} is not restricted anymore.");
+            log.Warning($"{sourceRow.Name.ExtractText()} is not restricted anymore.");
             return;
         }
 
-        var sourceSlot = ((EquipSlot)sourceRow.EquipSlotCategory.Row).ToSlot();
-        var targetSlot = ((EquipSlot)targetRow.EquipSlotCategory.Row).ToSlot();
+        var sourceSlot = ((EquipSlot)sourceRow.EquipSlotCategory.RowId).ToSlot();
+        var targetSlot = ((EquipSlot)targetRow.EquipSlotCategory.RowId).ToSlot();
         if (!sourceSlot.IsAccessory() && !sourceSlot.IsEquipment())
         {
-            log.Warning($"{sourceRow.Name.ToDalamudString().TextValue} is not equippable to a known slot.");
+            log.Warning($"{sourceRow.Name.ExtractText()} is not equippable to a known slot.");
             return;
         }
 
         if (sourceSlot != targetSlot)
         {
-            log.Warning($"{sourceRow.Name.ToDalamudString().TextValue} and {targetRow.Name.ToDalamudString().TextValue} are not compatible.");
+            log.Warning($"{sourceRow.Name.ExtractText()} and {targetRow.Name.ExtractText()} are not compatible.");
             return;
         }
 
