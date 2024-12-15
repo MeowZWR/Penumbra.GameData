@@ -34,6 +34,10 @@ public static class DataUtility
         return string.Intern(sb.ToString());
     }
 
+    /// <summary> Convert to text and replace unprintable symbols. </summary>
+    public static string ExtractTextExtended(this ReadOnlySeString s)
+        => s.ExtractText().Replace("\u00AD", string.Empty).Replace("\u00A0", string.Empty);
+
     /// <summary> Convert a given ReadonlySeString to title case and intern it. </summary>
     /// <param name="s"> The string to convert. </param>
     /// <param name="article"> The article byte indicates whether the name is used with an article, in which case the capitalization is already done right. </param>
@@ -41,20 +45,31 @@ public static class DataUtility
     public static string ToTitleCaseExtended(in ReadOnlySeString s, sbyte article)
     {
         if (article == 1)
-            return string.Intern(s.ToString());
+            return string.Intern(s.ExtractTextExtended());
 
-        var sb        = new StringBuilder(s.ToString());
+        var sb        = new StringBuilder(s.ExtractText());
         var lastSpace = true;
         for (var i = 0; i < sb.Length; ++i)
         {
-            if (sb[i] == ' ')
+            switch (sb[i])
             {
-                lastSpace = true;
-            }
-            else if (lastSpace)
-            {
-                lastSpace = false;
-                sb[i]     = char.ToUpperInvariant(sb[i]);
+                case ' ':
+                    lastSpace = true;
+                    break;
+                // Remove soft hyphens.
+                case '\u00AD' or '\u00A0':
+                    sb.Remove(i--, 1);
+                    break;
+                default:
+                {
+                    if (lastSpace)
+                    {
+                        lastSpace = false;
+                        sb[i]     = char.ToUpperInvariant(sb[i]);
+                    }
+
+                    break;
+                }
             }
         }
 
