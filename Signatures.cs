@@ -47,6 +47,9 @@ public static class Sigs
     public const string UnkMountAnimation = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 56 41 57 48 83 EC ?? 41 8B E9 45 0F B6 F8";
     public const string UnkParasolAnimation = "48 89 5C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 8B FA 4C 8B F1";
     public const string Dismount = "E9 ?? ?? ?? ?? B8 ?? ?? ?? ?? 66 44 3B F8";
+    public const string GetCachedScheduleResource = "40 53 48 83 EC ?? 44 8B 4A";
+    public const string LoadActionTmb = "E8 ?? ?? ?? ?? 48 89 43 ?? 0F B6 45";
+    public const string SchedulerResourceManagementInstance = "48 89 3D ?? ?? ?? ?? 8B C7";
 
     public const string
         ApricotListenerSoundPlay =
@@ -121,6 +124,10 @@ public static class Sigs
     // ShaderReplacementFixer
     public const string ModelRendererOnRenderMaterial = "E8 ?? ?? ?? ?? 44 0F B7 28";
     public const string ModelRendererUnkFunc          = "E8 ?? ?? ?? ?? 41 0F B6 46 ?? C0 E8";
+
+    // RenderTargetHdrEnabler
+    public const string RenderTargetManagerInitialize = "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC ?? 48 8B 1D";
+    public const string DeviceCreateTexture2D         = "E8 ?? ?? ?? ?? 48 89 07 48 8D 7F 20";
 
     // Job service
     public const string ChangeJob = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 56 41 57 48 83 EC ?? 44 0F B6 FA";
