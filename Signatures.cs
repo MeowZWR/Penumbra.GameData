@@ -15,6 +15,9 @@ public static class Sigs
 
     public const string ReadSqPack = "40 56 41 56 48 83 EC ?? 0F BE 02";
 
+    // The actual name of this function is unknown but it's related to updating async resource load states.
+    public const string UpdateResourceState = "E8 ?? ?? ?? ?? EB ?? 48 8D 4E ?? FF 15";
+
     // ResourceLoader.TexMdl
     public const string CheckFileState   = "E8 ?? ?? ?? ?? 48 85 C0 74 ?? 4C 8B C8";
     public const string LoadTexFileLocal = "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 30 49 8B F0 44 88 4C 24 20";
@@ -59,7 +62,9 @@ public static class Sigs
     public const string FootStepSound                  = "89 54 24 ?? 55 57 41 54 41 55 41 56";
 
     // PathResolver.DrawObjectState
-    public const string EnableDraw = "E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 48 85 C9 74 33 45 33 C0";
+    public const string EnableDraw     = "E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 48 85 C9 74 33 45 33 C0";
+    public const string SetupPlayerNpc = "E8 ?? ?? ?? ?? 48 C7 40 ?? ?? ?? ?? ?? 48 8B 4B";
+    public const string ConstructCutsceneCharacter = "48 89 5C 24 ?? 56 48 83 EC ?? 48 8B F1 45 33 C0";
 
     // PathResolver.Meta
     public const string UpdateModel       = "48 8B ?? 56 48 83 ?? ?? ?? B9";
