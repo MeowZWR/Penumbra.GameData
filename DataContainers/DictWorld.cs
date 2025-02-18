@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Lumina.Excel.Sheets;
@@ -26,6 +26,10 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, Logger lo
 
     private static bool IsValid(World world)
     {
+        //国际服
+        //if (world.Region != 2) 
+        //    return false; 
+
         if (world.Name.IsEmpty)
             return false;
 
@@ -35,7 +39,7 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, Logger lo
         if (world.IsPublic)
             return true;
 
-        if (world.DataCenter.RowId is 5 && world.DataCenter.RowId is > 1000 and not 1200)
+        if (world.UserType == 101 && world.RowId > 1000)
             return true;
 
         return char.IsUpper((char)world.Name.Data.Span[0]);
