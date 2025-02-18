@@ -35,6 +35,9 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, Logger lo
         if (world.IsPublic)
             return true;
 
+        if (world.DataCenter.RowId is 5 && world.DataCenter.RowId is > 1000 and not 1200)
+            return true;
+
         return char.IsUpper((char)world.Name.Data.Span[0]);
     }
 
