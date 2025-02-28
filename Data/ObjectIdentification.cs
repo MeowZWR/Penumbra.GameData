@@ -34,7 +34,7 @@ public sealed class ObjectIdentification(
     public void Identify(IDictionary<string, IIdentifiedObjectData?> set, string path)
     {
         var extension = Path.GetExtension(path).ToLowerInvariant();
-        if (extension is ".pap" or ".tmb" or ".scd" or ".avfx")
+        if (extension is ".pap" or ".tmb")
             if (IdentifyVfx(set, path))
                 return;
 
@@ -84,7 +84,7 @@ public sealed class ObjectIdentification(
         var slot  = info.EquipSlot is EquipSlot.LFinger ? EquipSlot.RFinger : info.EquipSlot;
         var items = _equipmentIdentification.Between(info.PrimaryId, slot, info.Variant);
         foreach (var item in items)
-            set[item.Name] = new IdentifiedItem(item);
+            set.UpdateCountOrSet(item.Name, () => new IdentifiedItem(item));
     }
 
     /// <summary> Find and add all weapons affected by <paramref name="info"/>. </summary>
@@ -92,7 +92,7 @@ public sealed class ObjectIdentification(
     {
         var items = _weaponIdentification.Between(info.PrimaryId, info.SecondaryId, info.Variant);
         foreach (var item in items)
-            set[item.Name] = new IdentifiedItem(item);
+            set.UpdateCountOrSet(item.Name, () => new IdentifiedItem(item));
     }
 
     /// <summary> Find and add all models affected by <paramref name="info"/>. </summary>
@@ -107,17 +107,8 @@ public sealed class ObjectIdentification(
         {
             var objectList = _modelCharaToObjects[model.RowId];
             foreach (var (name, kind, _) in objectList)
-                set[$"{name} ({kind.ToName()})"] = new IdentifiedModel(model);
+                set.UpdateCountOrSet($"{name} ({kind.ToName()})", () => new IdentifiedModel(model));
         }
-    }
-
-    /// <summary> Identities that only count their appearances store a counter value, increment or set that. </summary>
-    private static void AddCounterString(IDictionary<string, IIdentifiedObjectData?> set, string data)
-    {
-        if (set.TryGetValue(data, out var obj) && obj is IdentifiedCounter counter)
-            ++counter.Counter;
-        else
-            set[data] = new IdentifiedCounter();
     }
 
     /// <summary> Identify and add a game object info. </summary>
@@ -127,14 +118,14 @@ public sealed class ObjectIdentification(
         switch (info.FileType)
         {
             case FileType.Sound:
-                AddCounterString(set, FileType.Sound.ToString());
+                set.UpdateCountOrSet(FileType.Sound.ToString(), () => new IdentifiedCounter());
                 return;
             case FileType.Animation:
             case FileType.Pap:
-                AddCounterString(set, FileType.Animation.ToString());
+                set.UpdateCountOrSet(FileType.Animation.ToString(), () => new IdentifiedCounter());
                 return;
             case FileType.Shader:
-                AddCounterString(set, FileType.Shader.ToString());
+                set.UpdateCountOrSet(FileType.Shader.ToString(), () => new IdentifiedCounter());
                 return;
         }
 
@@ -148,7 +139,7 @@ public sealed class ObjectIdentification(
             case ObjectType.World:
             case ObjectType.Housing:
             case ObjectType.Font:
-                AddCounterString(set, info.ObjectType.ToString());
+                set.UpdateCountOrSet(info.ObjectType.ToString(), () => new IdentifiedCounter());
                 break;
             // We can differentiate icons by ID.
             case ObjectType.Icon:
@@ -179,8 +170,8 @@ public sealed class ObjectIdentification(
                         set[$"外貌：{raceString}{genderString}皮肤纹理"] = null;
                         break;
                     case CustomizationType.DecalFace:
-                        set[$"外貌：Face Decal {info.PrimaryId}"] =
-                            IdentifiedCustomization.FacePaint((CustomizeValue)info.PrimaryId.Id);
+                        set.UpdateCountOrSet($"外貌：Face Decal {info.PrimaryId}",
+                            () => IdentifiedCustomization.FacePaint((CustomizeValue)info.PrimaryId.Id));
                         break;
                     case CustomizationType.Iris when race == ModelRace.Unknown:
                         set["外貌：全部眼睛（反光/Catchlight）"] = null;
@@ -190,25 +181,38 @@ public sealed class ObjectIdentification(
                         break;
                     default:
                     {
-                        var customizationString = race == ModelRace.Unknown
-                         || info.BodySlot == BodySlot.Unknown
-                         || info.CustomizationType == CustomizationType.Unknown
+                        var customizationString = race is ModelRace.Unknown
+                         || info.BodySlot is BodySlot.Unknown
+                         || info.CustomizationType is CustomizationType.Unknown
                                 ? "外貌：未知"
-                                : $"外貌：{race.ToName()} {gender.ToName()} {info.BodySlot} ({info.CustomizationType}) {info.PrimaryId}";
-                        set[customizationString] = info.BodySlot switch
+                                : $"外貌：{race.ToName()} {gender.ToName()} {CompareBodyCustomization(info)} {info.PrimaryId}";
+                        set.UpdateCountOrSet(customizationString, () => info.BodySlot switch
                         {
                             BodySlot.Hair => IdentifiedCustomization.Hair(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             BodySlot.Tail => IdentifiedCustomization.Tail(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             BodySlot.Ear  => IdentifiedCustomization.Ears(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             BodySlot.Face => IdentifiedCustomization.Face(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             _             => null,
-                        };
+                        });
                         break;
                     }
                 }
 
                 break;
         }
+    }
+
+    private string CompareBodyCustomization(GameObjectInfo info)
+    {
+        return (info.BodySlot, info.CustomizationType) switch
+        {
+            (BodySlot.Hair, CustomizationType.Hair) or
+                (BodySlot.Face, CustomizationType.Face) or
+                (BodySlot.Tail, CustomizationType.Tail) or
+                (BodySlot.Body, CustomizationType.Body) or
+                (BodySlot.Ear, CustomizationType.Ear) => info.BodySlot.ToString(),
+            _ => $"{info.BodySlot} ({info.CustomizationType})",
+        };
     }
 
     /// <summary> Identify and parse VFX identities. </summary>
@@ -221,14 +225,14 @@ public sealed class ObjectIdentification(
         if (key.Length > 0 && _actions.TryGetValue(key, out var actions) && actions.Count > 0)
         {
             foreach (var action in actions)
-                set[$"Action: {action.Name.ExtractTextExtended()}"] = new IdentifiedAction(action);
+                set.UpdateCountOrSet($"Action: {action.Name.ExtractTextExtended()}", () => new IdentifiedAction(action));
             ret = true;
         }
 
         if (fileName.Length > 0 && _emotes.TryGetValue(fileName, out var emotes) && emotes.Count > 0)
         {
             foreach (var emote in emotes)
-                set[$"Emote: {emote.Name.ExtractTextExtended()}"] = new IdentifiedEmote(emote);
+                set.UpdateCountOrSet($"Emote: {emote.Name.ExtractTextExtended()}", () => new IdentifiedEmote(emote));
             ret = true;
         }
 
