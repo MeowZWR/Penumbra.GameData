@@ -31,10 +31,10 @@ public sealed class ObjectIdentification(
     /// <summary> Identify all affected game identities using <paramref name="path"/> and add those items to <paramref name="set"/>, </summary>
     /// <param name="set"> The set to add identities to. </param>
     /// <param name="path"> The path to parse and identify. </param>
-    public void Identify(IDictionary<string, IIdentifiedObjectData?> set, string path)
+    public void Identify(IDictionary<string, IIdentifiedObjectData> set, string path)
     {
         var extension = Path.GetExtension(path).ToLowerInvariant();
-        if (extension is ".pap" or ".tmb" or ".scd" or ".avfx")
+        if (extension is ".pap" or ".tmb")
             if (IdentifyVfx(set, path))
                 return;
 
@@ -45,9 +45,9 @@ public sealed class ObjectIdentification(
     /// <summary> Identify all affected game identities using <paramref name="path"/> and return them. </summary>
     /// <param name="path"> The path to parse and identify. </param>
     /// <returns> A dictionary of affected game identities. </returns>
-    public Dictionary<string, IIdentifiedObjectData?> Identify(string path)
+    public Dictionary<string, IIdentifiedObjectData> Identify(string path)
     {
-        Dictionary<string, IIdentifiedObjectData?> ret = [];
+        Dictionary<string, IIdentifiedObjectData> ret = [];
         Identify(ret, path);
         return ret;
     }
@@ -79,24 +79,24 @@ public sealed class ObjectIdentification(
     }
 
     /// <summary> Find and add all equipment pieces affected by <paramref name="info"/>. </summary>
-    private void FindEquipment(IDictionary<string, IIdentifiedObjectData?> set, GameObjectInfo info)
+    private void FindEquipment(IDictionary<string, IIdentifiedObjectData> set, GameObjectInfo info)
     {
         var slot  = info.EquipSlot is EquipSlot.LFinger ? EquipSlot.RFinger : info.EquipSlot;
         var items = _equipmentIdentification.Between(info.PrimaryId, slot, info.Variant);
         foreach (var item in items)
-            set[item.Name] = new IdentifiedItem(item);
+            set.UpdateCountOrSet(item.Name, () => new IdentifiedItem(item));
     }
 
     /// <summary> Find and add all weapons affected by <paramref name="info"/>. </summary>
-    private void FindWeapon(IDictionary<string, IIdentifiedObjectData?> set, GameObjectInfo info)
+    private void FindWeapon(IDictionary<string, IIdentifiedObjectData> set, GameObjectInfo info)
     {
         var items = _weaponIdentification.Between(info.PrimaryId, info.SecondaryId, info.Variant);
         foreach (var item in items)
-            set[item.Name] = new IdentifiedItem(item);
+            set.UpdateCountOrSet(item.Name, () => new IdentifiedItem(item));
     }
 
     /// <summary> Find and add all models affected by <paramref name="info"/>. </summary>
-    private void FindModel(IDictionary<string, IIdentifiedObjectData?> set, GameObjectInfo info)
+    private void FindModel(IDictionary<string, IIdentifiedObjectData> set, GameObjectInfo info)
     {
         var type = info.ObjectType.ToModelType();
         if (type is 0 or CharacterBase.ModelType.Weapon)
@@ -107,34 +107,25 @@ public sealed class ObjectIdentification(
         {
             var objectList = _modelCharaToObjects[model.RowId];
             foreach (var (name, kind, _) in objectList)
-                set[$"{name} ({kind.ToName()})"] = new IdentifiedModel(model);
+                set.UpdateCountOrSet($"{name} ({kind.ToName()})", () => new IdentifiedModel(model));
         }
     }
 
-    /// <summary> Identities that only count their appearances store a counter value, increment or set that. </summary>
-    private static void AddCounterString(IDictionary<string, IIdentifiedObjectData?> set, string data)
-    {
-        if (set.TryGetValue(data, out var obj) && obj is IdentifiedCounter counter)
-            ++counter.Counter;
-        else
-            set[data] = new IdentifiedCounter();
-    }
-
     /// <summary> Identify and add a game object info. </summary>
-    private void IdentifyParsed(IDictionary<string, IIdentifiedObjectData?> set, GameObjectInfo info)
+    private void IdentifyParsed(IDictionary<string, IIdentifiedObjectData> set, GameObjectInfo info)
     {
         // Some file types are only counted.
         switch (info.FileType)
         {
             case FileType.Sound:
-                AddCounterString(set, FileType.Sound.ToString());
+                set.UpdateCountOrSet(FileType.Sound.ToString(), () => new IdentifiedCounter());
                 return;
             case FileType.Animation:
             case FileType.Pap:
-                AddCounterString(set, FileType.Animation.ToString());
+                set.UpdateCountOrSet(FileType.Animation.ToString(), () => new IdentifiedCounter());
                 return;
             case FileType.Shader:
-                AddCounterString(set, FileType.Shader.ToString());
+                set.UpdateCountOrSet(FileType.Shader.ToString(), () => new IdentifiedCounter());
                 return;
         }
 
@@ -148,11 +139,11 @@ public sealed class ObjectIdentification(
             case ObjectType.World:
             case ObjectType.Housing:
             case ObjectType.Font:
-                AddCounterString(set, info.ObjectType.ToString());
+                set.UpdateCountOrSet(info.ObjectType.ToString(), () => new IdentifiedCounter());
                 break;
             // We can differentiate icons by ID.
             case ObjectType.Icon:
-                set[$"Icon: {info.IconId}"] = null;
+                set.UpdateCountOrSet($"Icon: {info.IconId}", () => new IdentifiedName());
                 break;
             // Demihumans and monsters affect models
             case ObjectType.DemiHuman:
@@ -176,33 +167,33 @@ public sealed class ObjectIdentification(
                 switch (info.CustomizationType)
                 {
                     case CustomizationType.Skin:
-                        set[$"外貌：{raceString}{genderString}皮肤纹理"] = null;
+                        set.UpdateCountOrSet($"外貌：{raceString}{genderString}皮肤纹理", () => new IdentifiedName());
                         break;
                     case CustomizationType.DecalFace:
-                        set[$"外貌：Face Decal {info.PrimaryId}"] =
-                            IdentifiedCustomization.FacePaint((CustomizeValue)info.PrimaryId.Id);
+                        set.UpdateCountOrSet($"外貌：面部贴花 {info.PrimaryId}",
+                            () => IdentifiedCustomization.FacePaint((CustomizeValue)info.PrimaryId.Id));
                         break;
                     case CustomizationType.Iris when race == ModelRace.Unknown:
-                        set["外貌：全部眼睛（反光/Catchlight）"] = null;
+                        set.UpdateCountOrSet("外貌：全部眼睛（反光）", () => new IdentifiedName());
                         break;
                     case CustomizationType.DecalEquip:
-                        set[$"Equipment Decal {info.PrimaryId}"] = null;
+                        set.UpdateCountOrSet("装备贴花 {info.PrimaryId}", () => new IdentifiedName());
                         break;
                     default:
                     {
-                        var customizationString = race == ModelRace.Unknown
-                         || info.BodySlot == BodySlot.Unknown
-                         || info.CustomizationType == CustomizationType.Unknown
+                        var customizationString = race is ModelRace.Unknown
+                         || info.BodySlot is BodySlot.Unknown
+                         || info.CustomizationType is CustomizationType.Unknown
                                 ? "外貌：未知"
-                                : $"外貌：{race.ToName()} {gender.ToName()} {info.BodySlot} ({info.CustomizationType}) {info.PrimaryId}";
-                        set[customizationString] = info.BodySlot switch
+                                : $"外貌：{race.ToName()} {gender.ToName()} {CompareBodyCustomization(info)} {info.PrimaryId}";
+                        set.UpdateCountOrSet(customizationString, () => info.BodySlot switch
                         {
                             BodySlot.Hair => IdentifiedCustomization.Hair(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             BodySlot.Tail => IdentifiedCustomization.Tail(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             BodySlot.Ear  => IdentifiedCustomization.Ears(race, gender, (CustomizeValue)info.PrimaryId.Id),
                             BodySlot.Face => IdentifiedCustomization.Face(race, gender, (CustomizeValue)info.PrimaryId.Id),
-                            _             => null,
-                        };
+                            _             => (IIdentifiedObjectData)new IdentifiedName(),
+                        });
                         break;
                     }
                 }
@@ -211,8 +202,21 @@ public sealed class ObjectIdentification(
         }
     }
 
+    private string CompareBodyCustomization(GameObjectInfo info)
+    {
+        return (info.BodySlot, info.CustomizationType) switch
+        {
+            (BodySlot.Hair, CustomizationType.Hair) or
+                (BodySlot.Face, CustomizationType.Face) or
+                (BodySlot.Tail, CustomizationType.Tail) or
+                (BodySlot.Body, CustomizationType.Body) or
+                (BodySlot.Ear, CustomizationType.Ear) => info.BodySlot.ToString(),
+            _ => $"{info.BodySlot} ({info.CustomizationType})",
+        };
+    }
+
     /// <summary> Identify and parse VFX identities. </summary>
-    private bool IdentifyVfx(IDictionary<string, IIdentifiedObjectData?> set, string path)
+    private bool IdentifyVfx(IDictionary<string, IIdentifiedObjectData> set, string path)
     {
         var key      = _gamePathParser.VfxToKey(path);
         var fileName = Path.GetFileName(path);
@@ -221,14 +225,14 @@ public sealed class ObjectIdentification(
         if (key.Length > 0 && _actions.TryGetValue(key, out var actions) && actions.Count > 0)
         {
             foreach (var action in actions)
-                set[$"Action: {action.Name.ExtractTextExtended()}"] = new IdentifiedAction(action);
+                set.UpdateCountOrSet($"Action: {action.Name.ExtractTextExtended()}", () => new IdentifiedAction(action));
             ret = true;
         }
 
         if (fileName.Length > 0 && _emotes.TryGetValue(fileName, out var emotes) && emotes.Count > 0)
         {
             foreach (var emote in emotes)
-                set[$"Emote: {emote.Name.ExtractTextExtended()}"] = new IdentifiedEmote(emote);
+                set.UpdateCountOrSet($"Emote: {emote.Name.ExtractTextExtended()}", () => new IdentifiedEmote(emote));
             ret = true;
         }
 
