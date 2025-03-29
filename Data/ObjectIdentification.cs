@@ -177,7 +177,7 @@ public sealed class ObjectIdentification(
                         set.UpdateCountOrSet("外貌：全部眼睛（反光）", () => new IdentifiedName());
                         break;
                     case CustomizationType.DecalEquip:
-                        set.UpdateCountOrSet("装备贴花 {info.PrimaryId}", () => new IdentifiedName());
+                        set.UpdateCountOrSet($"装备贴花 {info.PrimaryId}", () => new IdentifiedName());
                         break;
                     default:
                     {
