@@ -1,37 +1,134 @@
 ﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Hooking;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using ImGuiNET;
 using OtterGui.Log;
+using OtterGui.Text;
 using Penumbra.GameData.Data;
 using Penumbra.GameData.DataContainers.Bases;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
+using ShareTuple =
+    System.Tuple<string?[], bool[], System.Collections.Generic.List<nint>,
+        System.Collections.Generic.Dictionary<FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectId, nint>, int[],
+        System.Collections.Concurrent.ConcurrentDictionary<System.Action, byte>,
+        System.Collections.Concurrent.ConcurrentDictionary<System.Action, byte>>;
 
 namespace Penumbra.GameData.Interop;
 
-public unsafe class ObjectManager(IDalamudPluginInterface pi, Logger log, IFramework framework, IObjectTable objects)
-    : DataSharer<Tuple<DateTime[], List<nint>, Dictionary<GameObjectId, nint>, int[]>>(pi, log, "Penumbra.ObjectManager",
-        ClientLanguage.English, 1,
-        () => new Tuple<DateTime[], List<nint>, Dictionary<GameObjectId, nint>, int[]>(
-            [DateTime.UnixEpoch],
-            new List<nint>(objects.Length),
-            new Dictionary<GameObjectId, nint>(objects.Length), new int[4])), IReadOnlyCollection<Actor>
+public unsafe class ObjectManager(
+    IDalamudPluginInterface pi,
+    IGameInteropProvider interop,
+    Logger log,
+    IFramework framework,
+    IObjectTable objects)
+    : DataSharer<ShareTuple>(pi, log, "ObjectManager", ClientLanguage.English, 2, () => DefaultShareTuple(objects)), IReadOnlyCollection<Actor>
 {
-    public readonly  IObjectTable Objects  = objects;
-    private readonly Actor*       _address = (Actor*)Unsafe.AsPointer(ref GameObjectManager.Instance()->Objects.IndexSorted[0]);
+    private static ShareTuple DefaultShareTuple(IObjectTable objects)
+        => new([null], [true], new List<nint>(objects.Length), new Dictionary<GameObjectId, nint>(objects.Length), new int[4], [], []);
 
-    public virtual bool Update()
+    public readonly  IObjectTable Objects       = objects;
+    private readonly Actor*       _address      = (Actor*)Unsafe.AsPointer(ref GameObjectManager.Instance()->Objects.IndexSorted[0]);
+    private readonly string       _assemblyName = $"{log.PluginName}_{Guid.NewGuid().ToString().AsSpan(0, 8)}";
+
+    private readonly Logger _log = log;
+
+    public void DrawDebug()
+    {
+        using (ImUtf8.Group())
+        {
+            ImUtf8.Text("Hook Owner:");
+            ImUtf8.Text("Own Name:");
+            ImUtf8.Text("Dirty State:");
+            ImUtf8.Text("Count:");
+            ImUtf8.Text("BNPC End:");
+            ImUtf8.Text("Cutscene End:");
+            ImUtf8.Text("Special End:");
+            ImUtf8.Text("ENPC End:");
+            ImUtf8.Text("Update Subscribers:");
+            ImUtf8.Text("Update Req. Subscribers:");
+        }
+
+        ImGui.SameLine();
+        using (ImUtf8.Group())
+        {
+            ImUtf8.Text(HookOwner ?? "NULL");
+            ImUtf8.Text(_assemblyName);
+            ImUtf8.Text($"{NeedsUpdate}");
+            ImUtf8.Text($"{Count}");
+            ImUtf8.Text($"{BnpcEnd}");
+            ImUtf8.Text($"{CutsceneEnd}");
+            ImUtf8.Text($"{SpecialEnd}");
+            ImUtf8.Text($"{EnpcEnd}");
+            ImUtf8.Text($"{Value.Item6.Count}");
+            ImUtf8.Text($"{Value.Item7.Count}");
+        }
+    }
+
+    private void UpdateHooks()
+    {
+        if (HookOwner is not null)
+            return;
+
+        NeedsUpdate = true;
+        HookOwner   = _assemblyName;
+        _updateHook?.Dispose();
+        _log.Debug("[ObjectManager] Moving object table hook owner to this.");
+        _updateHook = interop.HookFromSignature<UpdateObjectArraysDelegate>(Sigs.UpdateObjectArrays, UpdateObjectArraysDetour);
+        _updateHook.Enable();
+    }
+
+    private void Update()
     {
         if (!framework.IsInFrameworkUpdateThread)
-            return false;
+            return;
 
-        var frame = framework.LastUpdateUTC;
-        if (LastFrame == frame)
-            return false;
+        UpdateHooks();
+        if (!NeedsUpdate)
+            return;
 
-        LastFrame = frame;
+        _log.Verbose("[ObjectManager] Updating object manager.");
+        NeedsUpdate = false;
+
+        UpdateAvailable();
+        InvokeUpdates();
+    }
+
+    private void InvokeUpdates()
+    {
+        foreach (var ac in Value.Item6.Keys)
+        {
+            try
+            {
+                ac.Invoke();
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"[ObjectManager] Error during invocation of update subscribers:\n{ex}");
+            }
+        }
+    }
+
+    private void InvokeRequiredUpdates()
+    {
+        foreach (var ac in Value.Item7.Keys)
+        {
+            try
+            {
+                ac.Invoke();
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"[ObjectManager] Error during invocation of required update subscribers:\n{ex}");
+            }
+        }
+    }
+
+    private void UpdateAvailable()
+    {
         InternalIdDict.Clear();
         InternalAvailable.Clear();
 
@@ -54,7 +151,7 @@ public unsafe class ObjectManager(IDalamudPluginInterface pi, Logger log, IFrame
         for (var i = ObjectIndex.IslandStart.Index; i < TotalCount; ++i)
             AddActor(i);
 
-        return true;
+        return;
 
         void AddActor(int index)
         {
@@ -68,87 +165,122 @@ public unsafe class ObjectManager(IDalamudPluginInterface pi, Logger log, IFrame
         }
     }
 
-    public IEnumerable<Actor> BattleNpcs
+    public IReadOnlyList<Actor> BattleNpcs
+        => new ListSlice(InternalAvailable, 0, BnpcEnd);
+
+    public IReadOnlyList<Actor> CutsceneCharacters
+        => new ListSlice(InternalAvailable, BnpcEnd, CutsceneEnd - BnpcEnd);
+
+    public IReadOnlyList<Actor> SpecialCharacters
+        => new ListSlice(InternalAvailable, CutsceneEnd, SpecialEnd - CutsceneEnd);
+
+    public IReadOnlyList<Actor> EventNpcs
+        => new ListSlice(InternalAvailable, SpecialEnd, EnpcEnd - SpecialEnd);
+
+    public IReadOnlyList<Actor> IslandNpcs
+        => new ListSlice(InternalAvailable, EnpcEnd);
+
+    private readonly struct ListSlice : IReadOnlyList<Actor>
     {
-        get
+        private readonly IReadOnlyList<nint> _list;
+        private readonly int                 _start;
+        private readonly int                 _count;
+
+        public ListSlice(IReadOnlyList<nint> list, int start = 0)
         {
-            for (var i = 0; i < BnpcEnd; ++i)
-                yield return InternalAvailable[i];
+            _list  = list;
+            _start = start;
+            _count = list.Count - start;
+            if (_count < 0 || _start < 0)
+                throw new IndexOutOfRangeException($"Can not slice list with {_list.Count} elements from {_start}.");
         }
-    }
 
-    public IEnumerable<Actor> CutsceneCharacters
-    {
-        get
+        public ListSlice(IReadOnlyList<nint> list, int start, int count)
         {
-            for (var i = BnpcEnd; i < CutsceneEnd; ++i)
-                yield return InternalAvailable[i];
+            _list  = list;
+            _start = start;
+            _count = count;
+            if (_start < 0)
+                throw new IndexOutOfRangeException($"Can not slice list with {_list.Count} elements from {_start}.");
+            if (_count < 0 || _start + _count > list.Count)
+                throw new IndexOutOfRangeException($"Can not slice {_count} elements of list with {_list.Count} elements from {_start}.");
         }
+
+        public IEnumerator<Actor> GetEnumerator()
+            => _list.Skip(_start).Take(_count).Select(i => (Actor)i).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
+
+        public int Count
+            => _count;
+
+        public Actor this[int index]
+            => _list[index + _start];
     }
 
-    public IEnumerable<Actor> SpecialCharacters
+
+    private int BnpcEnd
     {
-        get
-        {
-            for (var i = CutsceneEnd; i < SpecialEnd; ++i)
-                yield return InternalAvailable[i];
-        }
+        get => Value.Item5[0];
+        set => Value.Item5[0] = value;
     }
 
-    public IEnumerable<Actor> EventNpcs
+    private int CutsceneEnd
     {
-        get
-        {
-            for (var i = SpecialEnd; i < EnpcEnd; ++i)
-                yield return InternalAvailable[i];
-        }
+        get => Value.Item5[1];
+        set => Value.Item5[1] = value;
     }
 
-    public IEnumerable<Actor> IslandNpcs
+    private int SpecialEnd
     {
-        get
-        {
-            for (var i = EnpcEnd; i < InternalAvailable.Count; ++i)
-                yield return InternalAvailable[i];
-        }
+        get => Value.Item5[2];
+        set => Value.Item5[2] = value;
     }
 
-
-    protected int BnpcEnd
+    private int EnpcEnd
     {
-        get => Value.Item4[0];
-        set => Value.Item4[0] = value;
+        get => Value.Item5[3];
+        set => Value.Item5[3] = value;
     }
 
-    protected int CutsceneEnd
-    {
-        get => Value.Item4[1];
-        set => Value.Item4[1] = value;
-    }
-
-    protected int SpecialEnd
-    {
-        get => Value.Item4[2];
-        set => Value.Item4[2] = value;
-    }
-
-    protected int EnpcEnd
-    {
-        get => Value.Item4[3];
-        set => Value.Item4[3] = value;
-    }
-
-    protected DateTime LastFrame
+    private string? HookOwner
     {
         get => Value.Item1[0];
-        private set => Value.Item1[0] = value;
+        set => Value.Item1[0] = value;
     }
 
-    protected List<nint> InternalAvailable
-        => Value.Item2;
+    private bool NeedsUpdate
+    {
+        get => Value.Item2[0];
+        set => Value.Item2[0] = value;
+    }
 
-    protected Dictionary<GameObjectId, nint> InternalIdDict
-        => Value.Item3;
+#pragma warning disable CS8601 // Possible null reference assignment.
+    public event Action OnUpdate
+    {
+        add => Value.Item6.TryAdd(value, 0);
+        remove => Value.Item6.Remove(value, out _);
+    }
+
+    public event Action OnUpdateRequired
+    {
+        add => Value.Item7.TryAdd(value, 0);
+        remove => Value.Item7.Remove(value, out _);
+    }
+#pragma warning restore CS8601
+
+    private List<nint> InternalAvailable
+    {
+        get
+        {
+            Update();
+            return Value.Item3;
+        }
+    }
+
+    private Dictionary<GameObjectId, nint> InternalIdDict
+        => Value.Item4;
 
     public Actor this[ObjectIndex index]
         => this[(int)index.Index];
@@ -160,12 +292,8 @@ public unsafe class ObjectManager(IDalamudPluginInterface pi, Logger log, IFrame
     public Actor ById(GameObjectId id)
     {
         Update();
-        return ByIdWithoutUpdate(id);
+        return InternalIdDict.GetValueOrDefault(id, nint.Zero);
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Actor ByIdWithoutUpdate(GameObjectId id)
-        => InternalIdDict.GetValueOrDefault(id, nint.Zero);
 
     public Actor CompanionParent(Actor companion)
         => this[companion.Index.Index - 1];
@@ -200,5 +328,35 @@ public unsafe class ObjectManager(IDalamudPluginInterface pi, Logger log, IFrame
         => GetEnumerator();
 
     public int Count
-        => InternalAvailable.Count;
+    {
+        get
+        {
+            Update();
+            return InternalAvailable.Count;
+        }
+    }
+
+    protected override void Dispose(bool _)
+    {
+        base.Dispose(_);
+        _updateHook?.Dispose();
+        if (HookOwner == _assemblyName)
+        {
+            HookOwner   = null;
+            NeedsUpdate = true;
+            InvokeRequiredUpdates();
+        }
+    }
+
+    private delegate void UpdateObjectArraysDelegate(GameObjectManager* manager);
+
+    private Hook<UpdateObjectArraysDelegate>? _updateHook;
+
+    private void UpdateObjectArraysDetour(GameObjectManager* manager)
+    {
+        _updateHook!.Original(manager);
+        _log.Excessive("[ObjectManager] Update Object Arrays invoked.");
+        NeedsUpdate = true;
+        InvokeRequiredUpdates();
+    }
 }
