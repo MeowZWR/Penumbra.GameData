@@ -59,6 +59,6 @@ public static partial class Names
 {
     /// <summary> A dictionary converting path suffices into BodySlot. </summary>
     public static readonly IReadOnlyDictionary<string, BodySlot> StringToBodySlot =
-        Enum.GetValues<BodySlot>().Skip(1).Select(s => (s.ToSuffix(), s)).Append(("base", BodySlot.Body))
+        Enum.GetValues<BodySlot>().Skip(1).Select(s => (s.ToSuffix(), s)).Append(("base", BodySlot.Body)).Append(("top", BodySlot.Body))
             .ToFrozenDictionary(p => p.Item1, p => p.Item2);
 }
