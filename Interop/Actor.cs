@@ -143,6 +143,12 @@ public readonly unsafe struct Actor : IEquatable<Actor>
             ? AsCharacter->Effects.StatusEffects | EffectContainer.StatusEffect.IsGPoseWet
             : AsCharacter->Effects.StatusEffects & ~EffectContainer.StatusEffect.IsGPoseWet;
     }
+
+    public bool ShowVieraEars
+    {
+        get => !AsCharacter->DrawData.VieraEarsHidden;
+        set => AsCharacter->DrawData.VieraEarsHidden = !value;
+    }
 }
 
 public enum OnlineStatus : byte
