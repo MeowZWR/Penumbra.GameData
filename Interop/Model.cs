@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
@@ -187,4 +188,14 @@ public readonly unsafe struct Model : IEquatable<Model>
 
     public override string ToString()
         => $"0x{Address:X}";
+
+    public bool VieraEarsVisible
+    {
+        get => !AsCharacterBase->HideVieraEars;
+        set
+        {
+            AsCharacterBase->HideVieraEars     = !value;
+            AsCharacterBase->VieraEarsChanging = true;
+        }
+    }
 }
