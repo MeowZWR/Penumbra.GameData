@@ -1,5 +1,5 @@
 using Dalamud.Plugin.Services;
-using OtterGui.Log;
+using Luna;
 
 namespace Penumbra.GameData;
 
@@ -36,8 +36,11 @@ public static class Sigs
     public const string TexHandleOnLoad         = "40 53 55 41 54 41 55 41 56 41 57 48 81 EC ?? ?? ?? ?? 48 8B D9";
     public const string TexHandleUpdateCategory = "0F B7 41 ?? FF C8";
     public const string RsfServiceAddress       = "48 8B 05 ?? ?? ?? ?? 84 C9";
-    public const string SoundOnLoad             = "40 56 57 41 54 48 81 EC ?? ?? ?? ?? 80 3A ?? 45 0F B6 E0 48 8B F2 48 8B F9 75 ?? 83 BA ?? ?? ?? ?? ?? 72 ?? 48 8B 01 FF 90 ?? ?? ?? ?? 3C";
-    public const string LoadScdFileLocal        = "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 8B 79 ?? 48 8B DA 8B D7";
+
+    public const string SoundOnLoad =
+        "40 56 57 41 54 48 81 EC ?? ?? ?? ?? 80 3A ?? 45 0F B6 E0 48 8B F2 48 8B F9 75 ?? 83 BA ?? ?? ?? ?? ?? 72 ?? 48 8B 01 FF 90 ?? ?? ?? ?? 3C";
+
+    public const string LoadScdFileLocal = "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 8B 79 ?? 48 8B DA 8B D7";
 
     // GameEventManager
     public const string ResourceHandleDestructor = "48 89 5C 24 ?? 57 48 83 EC ?? 48 8D 05 ?? ?? ?? ?? 48 8B D9 48 89 01 B8";
@@ -56,11 +59,12 @@ public static class Sigs
     public const string LoadCharacterVfx           = "E8 ?? ?? ?? ?? 48 85 FF 48 8D 97";
     public const string LoadAreaVfx                = "E8 ?? ?? ?? ?? 0F 28 74 24 ?? 48 89 43";
     public const string ScheduleClipUpdate         = "40 53 55 56 57 48 81 EC ?? ?? ?? ?? 48 8B F9";
+    public const string CreateApricotDocument      = "E8 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 85 C0 48 8B 6C 24";
 
     public const string UnkMountAnimation =
         "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 54 41 56 41 57 48 83 EC ?? 45 8B F9";
 
-    public const string UnkParasolAnimation = "E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 84 C0 0F 84 ?? ?? ?? ?? 41 83 BE";
+    public const string UnkParasolAnimation = "E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B CE E8 ?? ?? ?? ?? 84 C0 0F 84 ?? ?? ?? ?? 41 83 BC 24";
     public const string Dismount = "E8 ?? ?? ?? ?? 48 8B 4F ?? F6 81";
     public const string GetCachedScheduleResource = "40 53 48 83 EC ?? 44 8B 4A";
     public const string LoadActionTmb = "E8 ?? ?? ?? ?? 48 89 43 ?? 0F B6 45";
@@ -167,7 +171,7 @@ public static class Sigs
     public const string UpdateOrnament = "E8 ?? ?? ?? ?? F3 0F 10 4E ?? 0F 57 D2";
 
     public const string PrepareColorSet = "E8 ?? ?? ?? ?? 49 89 04 ?? 49 83 C5";
-    public const string UpdateColorSets = "89 54 24 ?? 55 56 41 56 48 81 EC";
+    public const string CreateNewModel = "89 54 24 ?? 55 56 41 56 48 81 EC";
 
     public const string CalculateHeight = "E8 ?? ?? ?? FF 48 8B 0D ?? ?? ?? ?? 0F 28 F0";
 
@@ -187,10 +191,15 @@ public static class Sigs
     public const string LoadWeaponDependentResidentMotionPacks =
         "E8 ?? ?? ?? ?? 48 8B D0 48 8D 8E ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 4C 24 ?? 48 8B BC 24 ?? ?? ?? ?? 48 8B 5C 24";
 
-    public const string LoadInitialResidentMotionPacks = "E8 ?? ?? ?? ?? 48 8B 5D ?? 48 8B 7D ?? 48 3B DF 74 ?? 66 66 0F 1F 84 ?? 00 00 00 00 48 8B 96";
-    public const string LoadMotionPacks                = "E8 ?? ?? ?? 00 48 8B 44 24 ?? 49 89 04 24";
-    public const string LoadMotionPacks2               = "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 4C 8B 9D";
-    public const string LoadMigratoryMotionPack        = "E9 ?? ?? ?? ?? 8B 84 24 ?? ?? ?? ?? 48 8D 8C 24";
+    public const string LoadInitialResidentMotionPacks =
+        "E8 ?? ?? ?? ?? 48 8B 5D ?? 48 8B 7D ?? 48 3B DF 74 ?? 66 66 0F 1F 84 ?? 00 00 00 00 48 8B 96";
+
+    public const string LoadMotionPacks = "E8 ?? ?? ?? 00 48 8B 44 24 ?? 49 89 04 24";
+
+    public const string LoadMotionPacks2 =
+        "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 4C 8B 9D";
+
+    public const string LoadMigratoryMotionPack = "E9 ?? ?? ?? ?? 8B 84 24 ?? ?? ?? ?? 48 8D 8C 24";
 
     [Conditional("DEBUG")]
     public static void TestSignatures(ISigScanner scanner, Logger log)
@@ -206,7 +215,7 @@ public static class Sigs
                 missingSignatures = true;
                 continue;
             }
-        
+
             try
             {
                 var results = scanner.ScanAllText(value);
@@ -216,7 +225,7 @@ public static class Sigs
                         log.Error($"[Signature] {field.Name} ({value}): Not found.");
                         missingSignatures = true;
                         break;
-                    case 1: 
+                    case 1:
                         log.Information($"[Signature] {field.Name} ({value}): Match found.");
                         continue;
                     default:

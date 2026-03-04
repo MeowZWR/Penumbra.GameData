@@ -1,26 +1,57 @@
+using Luna.Generators;
+
 namespace Penumbra.GameData.Enums;
 
 /// <summary> All available racial scaling parameters. </summary>
+[NamedEnum]
 public enum RspAttribute : byte
 {
+    [Name("男性身体最小尺寸")]
     MaleMinSize,
+
+    [Name("男性身体最大尺寸")]
     MaleMaxSize,
+
+    [Name("男性尾巴最小长度")]
     MaleMinTail,
+
+    [Name("男性尾巴最大长度")]
     MaleMaxTail,
+
+    [Name("女性身体最小尺寸")]
     FemaleMinSize,
+
+    [Name("女性身体最大尺寸")]
     FemaleMaxSize,
+
+    [Name("女性尾巴最小长度")]
     FemaleMinTail,
+
+    [Name("女性尾巴最大长度")]
     FemaleMaxTail,
+
+    [Name("胸围最小X轴")]
     BustMinX,
+
+    [Name("胸围最小Y轴")]
     BustMinY,
+
+    [Name("胸围最小Z轴")]
     BustMinZ,
+
+    [Name("胸围最大X轴")]
     BustMaxX,
+
+    [Name("胸围最大Y轴")]
     BustMaxY,
+
+    [Name("胸围最大Z轴")]
     BustMaxZ,
+
     NumAttributes,
 }
 
-public static class RspAttributeExtensions
+public static partial class RspAttributeExtensions
 {
     /// <summary> For which gender a certain racial scaling parameter is available. </summary>
     public static Gender ToGender(this RspAttribute attribute)
@@ -41,26 +72,5 @@ public static class RspAttributeExtensions
             RspAttribute.BustMaxY      => Gender.Female,
             RspAttribute.BustMaxZ      => Gender.Female,
             _                          => Gender.Unknown,
-        };
-
-    /// <summary> Human-readable names for all racial scaling parameters. </summary>
-    public static string ToFullString(this RspAttribute attribute)
-        => attribute switch
-        {
-            RspAttribute.MaleMinSize   => "男性身体最小尺寸",
-            RspAttribute.MaleMaxSize   => "男性身体最大尺寸",
-            RspAttribute.FemaleMinSize => "女性身体最小尺寸",
-            RspAttribute.FemaleMaxSize => "女性身体最大尺寸",
-            RspAttribute.BustMinX      => "胸围最小X轴",
-            RspAttribute.BustMaxX      => "胸围最大X轴",
-            RspAttribute.BustMinY      => "胸围最小Y轴",
-            RspAttribute.BustMaxY      => "胸围最大Y轴",
-            RspAttribute.BustMinZ      => "胸围最小Z轴",
-            RspAttribute.BustMaxZ      => "胸围最大Z轴",
-            RspAttribute.MaleMinTail   => "男性尾巴最小长度",
-            RspAttribute.MaleMaxTail   => "男性尾巴最大长度",
-            RspAttribute.FemaleMinTail => "女性尾巴最小长度",
-            RspAttribute.FemaleMaxTail => "女性尾巴最大长度",
-            _                          => throw new InvalidEnumArgumentException(),
         };
 }

@@ -1,20 +1,60 @@
-﻿namespace Penumbra.GameData.Enums;
+﻿using ImSharp;
+using Luna.Generators;
+
+namespace Penumbra.GameData.Enums;
 
 /// <summary> Flags for all theoretically available crest positions. </summary>
 [Flags]
+[NamedEnum("ToLabel")]
+[TooltipEnum]
 public enum CrestFlag : ushort
 {
-    OffHand  = 0x0001,
-    Head     = 0x0002,
-    Body     = 0x0004,
-    Hands    = 0x0008,
-    Legs     = 0x0010,
-    Feet     = 0x0020,
-    Ears     = 0x0040,
-    Neck     = 0x0080,
-    Wrists   = 0x0100,
-    RFinger  = 0x0200,
-    LFinger  = 0x0400,
+    [Name("盾牌")]
+    [Tooltip("盾牌纹章")]
+    OffHand = 0x0001,
+
+    [Name("头部")]
+    [Tooltip("头部纹章")]
+    Head = 0x0002,
+
+    [Name("身体")]
+    [Tooltip("身体纹章")]
+    Body = 0x0004,
+
+    [Name("手套")]
+    [Tooltip("手套纹章")]
+    Hands = 0x0008,
+
+    [Name("裤子")]
+    [Tooltip("裤子纹章")]
+    Legs = 0x0010,
+
+    [Name("靴子")]
+    [Tooltip("靴子纹章")]
+    Feet = 0x0020,
+
+    [Name("耳环")]
+    [Tooltip("耳环纹章")]
+    Ears = 0x0040,
+
+    [Name("项链")]
+    [Tooltip("项链纹章")]
+    Neck = 0x0080,
+
+    [Name("手镯")]
+    [Tooltip("手镯纹章")]
+    Wrists = 0x0100,
+
+    [Name("右戒指")]
+    [Tooltip("右戒指纹章")]
+    RFinger = 0x0200,
+
+    [Name("左戒指")]
+    [Tooltip("左戒指纹章")]
+    LFinger = 0x0400,
+
+    [Name("武器")]
+    [Tooltip("武器纹章")]
     MainHand = 0x0800,
 }
 
@@ -36,7 +76,7 @@ public static class CrestExtensions
     public const CrestFlag AllRelevant = CrestFlag.Head | CrestFlag.Body | CrestFlag.OffHand;
 
     /// <summary> A set of the crest flags in use by the game. </summary>
-    public static readonly IReadOnlyList<CrestFlag> AllRelevantSet = Enum.GetValues<CrestFlag>().Where(f => AllRelevant.HasFlag(f)).ToArray();
+    public static readonly IReadOnlyList<CrestFlag> AllRelevantSet = CrestFlag.Values.Where(f => AllRelevant.HasFlag(f)).ToArray();
 
     /// <summary> An internally used index that assigns consecutive numbers to the crest flags in use. </summary>
     public static int ToInternalIndex(this CrestFlag flag)
@@ -84,24 +124,5 @@ public static class CrestExtensions
             EquipSlot.RFinger  => CrestFlag.RFinger,
             EquipSlot.LFinger  => CrestFlag.LFinger,
             _                  => 0,
-        };
-
-    /// <summary> Get a human-readable  name for a crest flag.</summary>
-    public static string ToLabel(this CrestFlag flag)
-        => flag switch
-        {
-            CrestFlag.Head     => "头部",
-            CrestFlag.Body     => "身体",
-            CrestFlag.Hands    => "手套",
-            CrestFlag.Legs     => "腿部",
-            CrestFlag.Feet     => "足部",
-            CrestFlag.Ears     => "耳饰",
-            CrestFlag.Neck     => "项链",
-            CrestFlag.Wrists   => "手镯",
-            CrestFlag.RFinger  => "右指",
-            CrestFlag.LFinger  => "左指",
-            CrestFlag.MainHand => "武器",
-            CrestFlag.OffHand  => "盾牌",
-            _                  => string.Empty,
         };
 }

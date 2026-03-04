@@ -1,48 +1,58 @@
+using Luna.Generators;
+
 namespace Penumbra.GameData.Enums;
 
 /// <summary> Types of game objects or identities. </summary>
+[NamedEnum]
 public enum ObjectType : byte
 {
     Unknown,
+
+    [Name("视觉效果")]
     Vfx,
+
+    [Name("亚人")]
     DemiHuman,
+
+    [Name("配饰")]
     Accessory,
+
+    [Name("小物件")]
     World,
+
+    [Name("装修物品")]
     Housing,
+
+    [Name("怪物")]
     Monster,
+
+    [Name("图标")]
     Icon,
+
+    [Name("加载界面")]
     LoadingScreen,
+
+    [Name("地图")]
     Map,
+
+    [Name("UI元素")]
     Interface,
+
+    [Name("装备")]
     Equipment,
+
+    [Name("角色")]
     Character,
+
+    [Name("武器")]
     Weapon,
+
+    [Name("字体")]
     Font,
 }
 
-public static class ObjectTypeExtensions
+public static partial class ObjectTypeExtensions
 {
-    /// <summary> Obtain human-readable names for ObjectType. </summary>
-    public static string ToName(this ObjectType type)
-        => type switch
-        {
-            ObjectType.Vfx           => "视觉效果",
-            ObjectType.DemiHuman     => "亚人",
-            ObjectType.Accessory     => "配饰",
-            ObjectType.World         => "小物件",
-            ObjectType.Housing       => "装修物品",
-            ObjectType.Monster       => "怪物",
-            ObjectType.Icon          => "图标",
-            ObjectType.LoadingScreen => "加载界面",
-            ObjectType.Map           => "地图",
-            ObjectType.Interface     => "UI元素",
-            ObjectType.Equipment     => "装备",
-            ObjectType.Character     => "角色",
-            ObjectType.Weapon        => "武器",
-            ObjectType.Font          => "字体",
-            _                        => "未知",
-        };
-
     /// <summary> A list of valid object types for IMC files. </summary>
     public static readonly IReadOnlyList<ObjectType> ValidImcTypes =
     [
