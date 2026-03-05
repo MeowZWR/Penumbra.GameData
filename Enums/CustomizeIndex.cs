@@ -1,43 +1,118 @@
-﻿namespace Penumbra.GameData.Enums;
+﻿using ImSharp;
+using Luna.Generators;
+
+namespace Penumbra.GameData.Enums;
 
 /// <summary> All options that can be configured for humans via the customize array. </summary>
+[NamedEnum]
 public enum CustomizeIndex : byte
 {
+    [Name("种族")]
     Race,
+
+    [Name("性别")]
     Gender,
+
+    [Name("身型")]
     BodyType,
+
+    [Name("身高")]
     Height,
+
+    [Name("部族")]
     Clan,
+
+    [Name("脸型")]
     Face,
+
+    [Name("发型")]
     Hairstyle,
+
+    [Name("启用挑染")]
     Highlights,
+
+    [Name("肤色")]
     SkinColor,
+
+    [Name("右眼")]
     EyeColorRight,
+
+    [Name("发色")]
     HairColor,
+
+    [Name("挑染颜色")]
     HighlightsColor,
+
+    [Name("黑痣与伤痕等 1")]
     FacialFeature1,
+
+    [Name("黑痣与伤痕等 2")]
     FacialFeature2,
+
+    [Name("黑痣与伤痕等 3")]
     FacialFeature3,
+
+    [Name("黑痣与伤痕等 4")]
     FacialFeature4,
+
+    [Name("黑痣与伤痕等 5")]
     FacialFeature5,
+
+    [Name("黑痣与伤痕等 6")]
     FacialFeature6,
+
+    [Name("黑痣与伤痕等 7")]
     FacialFeature7,
+
+    [Name("遗产纹身")]
     LegacyTattoo,
+
+    [Name("纹身颜色")]
     TattooColor,
+
+    [Name("眉形")]
     Eyebrows,
+
+    [Name("左眼")]
     EyeColorLeft,
+
+    [Name("小瞳孔")]
     EyeShape,
+
+    [Name("较小眼瞳")]
     SmallIris,
+
+    [Name("鼻型")]
     Nose,
+
+    [Name("脸部轮廓")]
     Jaw,
+
+    [Name("嘴型")]
     Mouth,
+
+    [Name("启用唇色")]
     Lipstick,
+
+    [Name("唇色")]
     LipColor,
+
+    [Name("肌肉")]
     MuscleMass,
+
+    [Name("尾巴形状")]
     TailShape,
+
+    [Name("胸围")]
     BustSize,
+
+    [Name("面妆")]
     FacePaint,
+
+    [Name("反转面妆")]
     FacePaintReversed,
+
+    [Name("面妆颜色")]
     FacePaintColor,
 }
 
@@ -47,7 +122,7 @@ public static class CustomizationExtensions
     public const int NumIndices = (int)CustomizeIndex.FacePaintColor + 1;
 
     /// <summary> A list of all options that are not race or body type. </summary>
-    public static readonly CustomizeIndex[] All = Enum.GetValues<CustomizeIndex>()
+    public static readonly CustomizeIndex[] All = CustomizeIndex.Values
         .Where(v => v is not CustomizeIndex.Race and not CustomizeIndex.BodyType).ToArray();
 
     /// <summary> A set of all options that are not race, gender, clan or body type. </summary>
@@ -100,49 +175,5 @@ public static class CustomizationExtensions
             CustomizeIndex.FacePaintReversed => (24, 0x80),
             CustomizeIndex.FacePaintColor    => (25, 0xFF),
             _                                => (0, 0x00),
-        };
-
-
-    /// <summary> Get the human-readable name for a customization option. </summary>
-    public static string ToDefaultName(this CustomizeIndex customizeIndex)
-        => customizeIndex switch
-        {
-            CustomizeIndex.Race              => "种族",
-            CustomizeIndex.Gender            => "性别",
-            CustomizeIndex.BodyType          => "身型",
-            CustomizeIndex.Height            => "身高",
-            CustomizeIndex.Clan              => "部族",
-            CustomizeIndex.Face              => "脸型",
-            CustomizeIndex.Hairstyle         => "发型",
-            CustomizeIndex.Highlights        => "启用挑染",
-            CustomizeIndex.SkinColor         => "肤色",
-            CustomizeIndex.EyeColorRight     => "右眼",
-            CustomizeIndex.HairColor         => "发色",
-            CustomizeIndex.HighlightsColor   => "挑染颜色",
-            CustomizeIndex.TattooColor       => "纹身颜色",
-            CustomizeIndex.Eyebrows          => "眉形",
-            CustomizeIndex.EyeColorLeft      => "左眼",
-            CustomizeIndex.EyeShape          => "小瞳孔",
-            CustomizeIndex.Nose              => "鼻型",
-            CustomizeIndex.Jaw               => "脸部轮廓",
-            CustomizeIndex.Mouth             => "嘴型",
-            CustomizeIndex.MuscleMass        => "肌肉",
-            CustomizeIndex.TailShape         => "尾巴形状",
-            CustomizeIndex.BustSize          => "胸围",
-            CustomizeIndex.FacePaint         => "面妆",
-            CustomizeIndex.FacePaintColor    => "面妆颜色",
-            CustomizeIndex.LipColor          => "唇色",
-            CustomizeIndex.FacialFeature1    => "黑痣与伤痕等 1",
-            CustomizeIndex.FacialFeature2    => "黑痣与伤痕等 2",
-            CustomizeIndex.FacialFeature3    => "黑痣与伤痕等 3",
-            CustomizeIndex.FacialFeature4    => "黑痣与伤痕等 4",
-            CustomizeIndex.FacialFeature5    => "黑痣与伤痕等 5",
-            CustomizeIndex.FacialFeature6    => "黑痣与伤痕等 6",
-            CustomizeIndex.FacialFeature7    => "黑痣与伤痕等 7",
-            CustomizeIndex.LegacyTattoo      => "遗产纹身",
-            CustomizeIndex.SmallIris         => "较小眼瞳",
-            CustomizeIndex.Lipstick          => "启用唇色",
-            CustomizeIndex.FacePaintReversed => "反转面妆",
-            _                                => string.Empty,
         };
 }

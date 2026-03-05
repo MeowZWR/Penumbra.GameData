@@ -1,89 +1,160 @@
+using ImSharp;
 using Lumina.Excel.Sheets;
+using Luna.Generators;
 
 namespace Penumbra.GameData.Enums;
 
 /// <summary> A full equipment type representing any type of equipment a character can wear. </summary>
+[NamedEnum]
 public enum FullEquipType : byte
 {
+    [Name(Omit: true)]
     Unknown,
 
+    [Name("头部")]
     Head,
+    [Name("身体")]
     Body,
+    [Name("手臂")]
     Hands,
+    [Name("腿部")]
     Legs,
+    [Name("脚部")]
     Feet,
 
+    [Name("耳部")]
     Ears,
+    [Name("颈部")]
     Neck,
+    [Name("腕部")]
     Wrists,
+    [Name("戒指")]
     Finger,
 
+    [Name("格斗武器")]
     Fists, // PGL, MNK
+    [Name("格斗武器（副手）")]
     FistsOff,
+    [Name("单手剑")]
     Sword, // GLA, PLD Main
+    [Name("大斧")]
     Axe,   // MRD, WAR
+    [Name("弓")]
     Bow,   // ARC, BRD
+    [Name("箭袋")]
     BowOff,
+    [Name("长枪")]
     Lance,   // LNC, DRG,
+    [Name("双手杖")]
     Staff,   // THM, BLM, CNJ, WHM
+    [Name("单手杖")]
     Wand,    // THM, BLM, CNJ, WHM Main
+    [Name("魔导书")]
     Book,    // ACN, SMN, SCH
+    [Name("双剑")]
     Daggers, // ROG, NIN
+    [Name("双剑（副手）")]
     DaggersOff,
+    [Name("双手剑")]
     Broadsword, // DRK,
+    [Name("火枪")]
     Gun,        // MCH,
+    [Name("以太变换器")]
     GunOff,
+    [Name("天球仪")]
     Orrery, // AST,
+    [Name("卡套")]
     OrreryOff,
+    [Name("武士刀")]
     Katana, // SAM
+    [Name("刀鞘")]
     KatanaOff,
+    [Name("刺剑")]
     Rapier, // RDM
+    [Name("触媒")]
     RapierOff,
+    [Name("青魔杖")]
     Cane,     // BLU
+    [Name("枪刃")]
     Gunblade, // GNB,
+    [Name("投掷武器")]
     Glaives,  // DNC,
+    [Name("投掷武器（副手）")]
     GlaivesOff,
+    [Name("镰刀")]
     Scythe,   // RPR,
+    [Name("贤具")]
     Nouliths, // SGE
+    [Name("盾")]
     Shield,   // GLA, PLD, THM, BLM, CNJ, WHM Off
 
+    [Name("刻木工具")]
     Saw,             // CRP
+    [Name("锻铁工具")]
     CrossPeinHammer, // BSM
+    [Name("铸甲工具")]
     RaisingHammer,   // ARM
+    [Name("雕金工具")]
     LapidaryHammer,  // GSM
+    [Name("制革工具")]
     Knife,           // LTW
+    [Name("裁衣工具")]
     Needle,          // WVR
+    [Name("炼金工具")]
     Alembic,         // ALC
+    [Name("烹调工具")]
     Frypan,          // CUL
+    [Name("采矿工具")]
     Pickaxe,         // MIN
+    [Name("园艺工具")]
     Hatchet,         // BTN
+    [Name("捕鱼用具")]
     FishingRod,      // FSH
 
+    [Name("羊角锤")]
     ClawHammer,    // CRP Off
+    [Name("锉刀")]
     File,          // BSM Off
+    [Name("手钳")]
     Pliers,        // ARM Off
+    [Name("砂轮机")]
     GrindingWheel, // GSM Off
+    [Name("平斩")]
     Awl,           // LTW Off
+    [Name("纺车")]
     SpinningWheel, // WVR Off
+    [Name("研钵")]
     Mortar,        // ALC Off
+    [Name("厨刀")]
     CulinaryKnife, // CUL Off
+    [Name("碎石锤")]
     Sledgehammer,  // MIN Off
+    [Name("园艺镰刀")]
     GardenScythe,  // BTN Off
+    [Name("渔叉")]
     Gig,           // FSH Off
 
+    [Name("笔刷")]
     Brush,        // PCT
+    [Name("调色盘")]
     Palette,      // PCT Off
+    [Name("双剑")]
     Twinfangs,    // VPR
+    [Name("双剑（副手）")]
     TwinfangsOff, // VPR Off
+    [Name("鞭子")]
     Whip,         // BMR TODO
 
+    [Name("眼镜")]
     Glasses,
 
+    [Name("主手武器")]
     UnknownMainhand,
+    [Name("副手武器")]
     UnknownOffhand,
 }
 
-public static class FullEquipTypeExtensions
+public static partial class FullEquipTypeExtensions
 {
     /// <summary> Obtain the FullEquipType of an item. </summary>
     internal static FullEquipType ToEquipType(this Item item)
@@ -192,80 +263,6 @@ public static class FullEquipTypeExtensions
         {
             FullEquipType.Glasses => BonusItemFlag.Glasses,
             _                     => BonusItemFlag.Unknown,
-        };
-
-    /// <summary> Obtain a human-readable name for a FullEquipType. </summary>
-    public static string ToName(this FullEquipType type)
-        => type switch
-        {
-            FullEquipType.Head            => EquipSlot.Head.ToName(),
-            FullEquipType.Body            => EquipSlot.Body.ToName(),
-            FullEquipType.Hands           => EquipSlot.Hands.ToName(),
-            FullEquipType.Legs            => EquipSlot.Legs.ToName(),
-            FullEquipType.Feet            => EquipSlot.Feet.ToName(),
-            FullEquipType.Ears            => EquipSlot.Ears.ToName(),
-            FullEquipType.Neck            => EquipSlot.Neck.ToName(),
-            FullEquipType.Wrists          => EquipSlot.Wrists.ToName(),
-            FullEquipType.Finger          => "戒指",
-            FullEquipType.Fists           => "格斗武器",
-            FullEquipType.FistsOff        => "格斗武器（副手）",
-            FullEquipType.Sword           => "单手剑",
-            FullEquipType.Axe             => "大斧",
-            FullEquipType.Bow             => "弓",
-            FullEquipType.BowOff          => "箭袋",
-            FullEquipType.Lance           => "长枪",
-            FullEquipType.Staff           => "双手杖",
-            FullEquipType.Wand            => "单手杖",
-            FullEquipType.Book            => "魔导书",
-            FullEquipType.Daggers         => "双剑",
-            FullEquipType.DaggersOff      => "双剑（副手）",
-            FullEquipType.Broadsword      => "双手剑",
-            FullEquipType.Gun             => "火枪",
-            FullEquipType.GunOff          => "以太转换器",
-            FullEquipType.Orrery          => "天球仪",
-            FullEquipType.OrreryOff       => "卡套",
-            FullEquipType.Katana          => "武士刀",
-            FullEquipType.KatanaOff       => "刀鞘",
-            FullEquipType.Rapier          => "刺剑",
-            FullEquipType.RapierOff       => "触媒",
-            FullEquipType.Cane            => "青魔杖",
-            FullEquipType.Gunblade        => "枪刃",
-            FullEquipType.Glaives         => "投掷武器",
-            FullEquipType.GlaivesOff      => "投掷武器（副手）",
-            FullEquipType.Scythe          => "镰刀",
-            FullEquipType.Nouliths        => "贤具",
-            FullEquipType.Shield          => "盾",
-            FullEquipType.Saw             => "刻木工具",
-            FullEquipType.CrossPeinHammer => "锻铁工具",
-            FullEquipType.RaisingHammer   => "铸甲工具",
-            FullEquipType.LapidaryHammer  => "雕金工具",
-            FullEquipType.Knife           => "制革工具",
-            FullEquipType.Needle          => "裁衣工具",
-            FullEquipType.Alembic         => "炼金工具",
-            FullEquipType.Frypan          => "烹调工具",
-            FullEquipType.Pickaxe         => "采矿工具",
-            FullEquipType.Hatchet         => "园艺工具",
-            FullEquipType.FishingRod      => "捕鱼用具",
-            FullEquipType.ClawHammer      => "羊角锤",
-            FullEquipType.File            => "锉刀",
-            FullEquipType.Pliers          => "手钳",
-            FullEquipType.GrindingWheel   => "砂轮机",
-            FullEquipType.Awl             => "平斩",
-            FullEquipType.SpinningWheel   => "纺车",
-            FullEquipType.Mortar          => "研钵",
-            FullEquipType.CulinaryKnife   => "厨刀",
-            FullEquipType.Sledgehammer    => "碎石锤",
-            FullEquipType.GardenScythe    => "园艺镰刀",
-            FullEquipType.Gig             => "渔叉",
-            FullEquipType.Brush           => "笔刷",
-            FullEquipType.Palette         => "调色盘",
-            FullEquipType.Twinfangs       => "双剑",
-            FullEquipType.TwinfangsOff    => "双剑（副手）",
-            FullEquipType.Whip            => "鞭子",
-            FullEquipType.Glasses         => "眼镜",
-            FullEquipType.UnknownMainhand => EquipSlot.MainHand.ToName(),
-            FullEquipType.UnknownOffhand  => EquipSlot.OffHand.ToName(),
-            _                             => "未知",
         };
 
     /// <summary> Return the actual equipment slot a FullEquipType will be equipped to. </summary>
@@ -545,26 +542,26 @@ public static class FullEquipTypeExtensions
 
     /// <summary> A list of all weapon types. </summary>
     public static readonly IReadOnlyList<FullEquipType> WeaponTypes
-        = Enum.GetValues<FullEquipType>().Where(v => v.IsWeapon()).Except([FullEquipType.UnknownMainhand])
+        = FullEquipType.Values.Where(v => v.IsWeapon()).Except([FullEquipType.UnknownMainhand])
             .ToArray();
 
     /// <summary> A list of all tool types, including offhands. </summary>
     public static readonly IReadOnlyList<FullEquipType> ToolTypes
-        = Enum.GetValues<FullEquipType>().Where(v => v.IsTool()).ToArray();
+        = FullEquipType.Values.Where(v => v.IsTool()).ToArray();
 
     /// <summary> A list of all equipment types. </summary>
     public static readonly IReadOnlyList<FullEquipType> EquipmentTypes
-        = Enum.GetValues<FullEquipType>().Where(v => v.IsEquipment()).ToArray();
+        = FullEquipType.Values.Where(v => v.IsEquipment()).ToArray();
 
     /// <summary> A list of all accessory types. </summary>
     public static readonly IReadOnlyList<FullEquipType> AccessoryTypes
-        = Enum.GetValues<FullEquipType>().Where(v => v.IsAccessory()).ToArray();
+        = FullEquipType.Values.Where(v => v.IsAccessory()).ToArray();
 
     /// <summary> A list of all inferred offhand types. </summary>
     public static readonly IReadOnlyList<FullEquipType> OffhandTypes
-        = Enum.GetValues<FullEquipType>().Where(IsOffhandType).ToArray();
+        = FullEquipType.Values.Where(IsOffhandType).ToArray();
 
     /// <summary> A list of all inferred offhand types. </summary>
     public static readonly IReadOnlyList<FullEquipType> BonusTypes
-        = Enum.GetValues<FullEquipType>().Where(IsBonus).ToArray();
+        = FullEquipType.Values.Where(IsBonus).ToArray();
 }

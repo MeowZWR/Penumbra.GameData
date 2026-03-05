@@ -1,4 +1,3 @@
-using System.Linq;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
@@ -116,30 +115,30 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
                     {
                         var parts = name.Split(' ', 3);
                         return parts.Length switch
-                        {
-                            2 => $"{parts[0][0]}. {parts[1][0]}.",
-                            3 => $"{parts[0][0]}. {parts[1][0]}. {parts[2]}",
-                            _ => $"ERROR ({name})",
-                        };
+                         {
+                             2 => $"{parts[0][0]}. {parts[1][0]}.",
+                             3 => $"{parts[0][0]}. {parts[1][0]}. {parts[2]}",
+                             _ => $"ERROR ({name})",
+                         };
                     }
                 case IdentifierType.Owned:
                     {
                         var parts = name.Split(' ', 3);
                         return parts.Length switch
-                        {
-                            3 when parts[2][0] is '(' => $"{parts[0][0]}. {parts[1][0]}. {parts[2]}",
-                            3                         => $"{parts[0][0]}. {parts[1][0]}.'s {parts[2]}",
-                            _                         => $"ERROR ({name})",
-                        };
+                         {
+                             3 when parts[2][0] is '(' => $"{parts[0][0]}. {parts[1][0]}. {parts[2]}",
+                             3                         => $"{parts[0][0]}. {parts[1][0]}.'s {parts[2]}",
+                             _                         => $"ERROR ({name})",
+                         };
                     }
                 case IdentifierType.Retainer:
                     {
                         var parts = name.Split(' ', 2);
                         return parts.Length switch
-                        {
-                            2 => $"{parts[0][0]}. {parts[1]}",
-                            _ => $"ERROR ({name})",
-                        };
+                         {
+                             2 => $"{parts[0][0]}. {parts[1]}",
+                             _ => $"ERROR ({name})",
+                         };
                     }
             }
         }
@@ -152,31 +151,31 @@ public readonly struct ActorIdentifier : IEquatable<ActorIdentifier>
                     {
                         var parts = name.Split(' ', 2);
                         return parts.Length switch
-                        {
-                            1 => $"{parts[0][0]}*",
-                            2 => $"{parts[0][0]}*{parts[1]}",
-                            _ => $"ERROR ({name})",
-                        };                        
+                         {
+                             1 => $"{parts[0][0]}*",
+                             2 => $"{parts[0][0]}*{parts[1]}",
+                             _ => $"ERROR ({name})",
+                         };        
                     }
                 case IdentifierType.Owned:
                     {
                         var parts = name.Split('的', 2);
                         return parts.Length switch
-                        {
-                            1 => $"{parts[0][0]}*",
-                            2 => $"{parts[0][0]}*的{parts[1]}",
-                            _ => $"ERROR ({name})",
-                        };
+                         {
+                             1 => $"{parts[0][0]}*",
+                             2 => $"{parts[0][0]}*的{parts[1]}",
+                             _ => $"ERROR ({name})",
+                         };
                     }
                 case IdentifierType.Retainer:
                     {
                         var parts = name.Split(' ', 2);
                         return parts.Length switch
-                        {
-                            1 => $"{parts[0][0]}*",
-                            2 => $"{parts[0][0]}*{parts[1]}",
-                            _ => $"ERROR ({name})",
-                        };
+                         {
+                             1 => $"{parts[0][0]}*",
+                             2 => $"{parts[0][0]}*{parts[1]}",
+                             _ => $"ERROR ({name})",
+                         };
                     }
             }
         }

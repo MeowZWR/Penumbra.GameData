@@ -1,9 +1,6 @@
 using System.Collections.Frozen;
-using Dalamud.Bindings.ImGui;
-using Dalamud.Interface;
-using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
-using OtterGui;
+using ImSharp;
 using Penumbra.GameData.Data;
 using Penumbra.GameData.DataContainers.Bases;
 using Penumbra.GameData.Enums;
@@ -15,12 +12,12 @@ using ObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 namespace Penumbra.GameData.Actors;
 
 /// <summary> Creation of ActorIdentifiers. </summary>
-public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framework, NameDicts _data, CutsceneResolver _toParentIdx)
+public class ActorIdentifierFactory(ObjectManager objects, IFramework framework, NameDicts data, CutsceneResolver toParentIdx)
 {
     /// <summary> Expose the _toParentIdx function for convenience. </summary>
     /// <returns> The parent index for a cutscene object or -1 if no parent exists. </returns>
     public short ToCutsceneParent(ushort index)
-        => _toParentIdx.Invoke(index);
+        => toParentIdx.Invoke(index);
 
     /// <summary> Used in construction from user strings. </summary>
     public class IdentifierParseError(string reason) : Exception(reason);
@@ -28,9 +25,9 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     /// <summary> Create an ImGui Tooltip for user strings. </summary>
     public static void WriteUserStringTooltip(bool withIndex)
     {
-        using var tt   = ImRaii.Tooltip();
-        using var font = ImRaii.PushFont(UiBuilder.MonoFont);
-        ImGui.TextUnformatted("标识符字符串的有效格式为：");
+        using var tt   = Im.Tooltip.Begin();
+        using var font = Im.Font.PushMono();
+        Im.Text("标识符字符串的有效格式为："u8);
 
         const uint typeColor    = 0xFF40FF40;
         const uint nameColor    = 0xFF00D0D0;
@@ -39,67 +36,112 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         const uint npcNameColor = 0xFF4040FF;
         const uint indexColor   = 0xFFA0A0A0;
 
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("P", typeColor), (" | ", keyColor), ("[玩家名称]@<服务器名称>", nameColor));
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("P"u8, typeColor)
+            .Then(" | "u8,                        keyColor)
+            .Then("[玩家名称]@<服务器名称>"u8, nameColor)
+            .End();
 
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("R", typeColor), (" | ", keyColor), ("[雇员名称]", nameColor));
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("R"u8, typeColor)
+            .Then(" | "u8,             keyColor)
+            .Then("[雇员名称]"u8, nameColor)
+            .End();
 
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("N", typeColor), (" | ", keyColor), ("[NPC类型]", npcTypeColor), (" : ", keyColor),
-            ("[NPC名称]", npcNameColor));
-        if (withIndex)
-        {
-            ImGui.SameLine(0, 0);
-            ImGuiUtil.DrawColoredText(("@", keyColor), ("<Object Index>", indexColor));
-        }
-
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("所有的 [] 或 <> 这样的括号只是占位符不需要输入，所有的", 0),
-            ("亮蓝色符号", keyColor), ("必须使用。", 0));
-
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("O", typeColor), (" | ", keyColor), ("[NPC类型]", npcTypeColor), (" : ", keyColor),
-            ("[NPC名称]", npcNameColor), (" | ", keyColor), ("[玩家名称]@<服务器名称>", nameColor));
-
-        ImGui.NewLine();
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[P]", typeColor), ("玩家，", 0), ("[R]", typeColor), ("雇员，", 0), ("[N]", typeColor), ("NPC或", 0),
-            ("[O]", typeColor), ("从属的描述标识符类型", 0));
-
-        ImGui.NewLine();
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[玩家名称]", nameColor), ("和", 0), ("[雇员名称]", nameColor),
-            ("必须符合命名规则。", 0));
-
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("<服务器名称>", nameColor), ("是可填项（如果不提供则代表", 0), ("任意服务器", nameColor),
-            ("），填写则必须是有效服务器名称。", 0));
-
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[NPC类型]", npcTypeColor), ("可以是", 0), ("[M]", npcTypeColor), ("坐骑，", 0), ("[C]", npcTypeColor),
-            ("宠物，", 0), ("[A]", npcTypeColor), ("时尚佩饰，", 0), ("[E]", npcTypeColor), ("事件NPC或", 0), ("[B]", npcTypeColor),
-            ("战斗NPC", 0));
-
-        ImGui.Bullet();
-        ImGui.SameLine();
-        ImGuiUtil.DrawColoredText(("[NPC名称]", npcNameColor), ("必须是符合所选类型且有效已知的名称", 0));
+        Im.Bullet();
+        Im.Line.Same();
+        var text = ImEx.TextMultiColored("N"u8, typeColor)
+            .Then(" | "u8,        keyColor)
+            .Then("[NPC类型]"u8, npcTypeColor)
+            .Then(" : "u8,        keyColor)
+            .Then("[NPC名称]"u8, npcNameColor);
 
         if (withIndex)
+            text.Then("@"u8, keyColor)
+                .Then("<Object Index>"u8, indexColor)
+                .End();
+        else
+            text.End();
+
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("所有的 [] 或 <> 这样的括号只是占位符不需要输入，所有的"u8)
+            .Then("亮蓝色符号"u8, keyColor)
+            .Then("必须使用。"u8)
+            .End();
+
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("O"u8, typeColor)
+            .Then(" | "u8,                        keyColor)
+            .Then("[NPC类型]"u8,                 npcTypeColor)
+            .Then(" : "u8,                        keyColor)
+            .Then("[NPC名称]"u8,                 npcNameColor)
+            .Then(" | "u8,                        keyColor)
+            .Then("[玩家名称]@<服务器名称>"u8, nameColor)
+            .End();
+
+        Im.Line.New();
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("[P]"u8, typeColor)
+            .Then("玩家, "u8)
+            .Then("[R]"u8, typeColor)
+            .Then("雇员, "u8)
+            .Then("[N]"u8, typeColor)
+            .Then("NPC或 "u8)
+            .Then("[O]"u8, typeColor)
+            .Then("从属的描述标识符类型。"u8)
+            .End();
+
+        Im.Line.New();
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("[玩家名称]"u8, nameColor)
+            .Then("和"u8)
+            .Then("[雇员名称]"u8, nameColor)
+            .Then("必须符合命名规则。"u8)
+            .End();
+
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("<服务器名称>"u8, nameColor)
+            .Then("是可填项（如果不提供则代表"u8)
+            .Then("任意服务器"u8, nameColor)
+            .Then("），填写则必须是有效服务器名称。"u8)
+            .End();
+
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("[NPC类型]"u8, npcTypeColor)
+            .Then("可以是"u8)
+            .Then("[M]"u8, npcTypeColor)
+            .Then("坐骑, "u8)
+            .Then("[C]"u8, npcTypeColor)
+            .Then("宠物, "u8)
+            .Then("[A]"u8, npcTypeColor)
+            .Then("时尚佩饰, "u8)
+            .Then("[E]"u8, npcTypeColor)
+            .Then("事件NPC或"u8)
+            .Then("[B]"u8, npcTypeColor)
+            .Then("战斗NPC。"u8)
+            .End();
+
+        Im.Bullet();
+        Im.Line.Same();
+        ImEx.TextMultiColored("[NPC名称]"u8, npcNameColor)
+            .Then("必须是符合所选类型且有效已知的名称"u8)
+            .End();
+
+        if (withIndex)
         {
-            ImGui.Bullet();
-            ImGui.SameLine();
-            ImGuiUtil.DrawColoredText(("<Object Index>", indexColor),
-                (" is optional and must be a non-negative index into the object table.", 0));
+            Im.Bullet();
+            Im.Line.Same();
+            ImEx.TextMultiColored("<Object Index>"u8, indexColor)
+                .Then(" is optional and must be a non-negative index into the object table."u8)
+                .End();
         }
     }
 
@@ -305,6 +347,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         if (name.Length == 0) return false;
         return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name);
     }
+
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<char> name)
     {
@@ -314,7 +357,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
 
     /// <summary> Checks if the world is a valid public world or ushort.MaxValue (any world). </summary>
     public bool VerifyWorld(WorldId worldId)
-        => worldId == WorldId.AnyWorld || _data.Worlds.ContainsKey(worldId.Id);
+        => worldId == WorldId.AnyWorld || data.Worlds.ContainsKey(worldId.Id);
 
     /// <summary> Verify that the enum value is a specific actor and return the name if it is. </summary>
     public static bool VerifySpecial(ScreenActor actor)
@@ -328,7 +371,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         if (index < ObjectIndex.GPosePlayer)
             return (index.Index & 1) == 0;
         if (index > ObjectIndex.Card8)
-            return index.Index < _objects.TotalCount;
+            return index.Index < objects.TotalCount;
 
         return index < ObjectIndex.CharacterScreen;
     }
@@ -338,10 +381,10 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     {
         return kind switch
         {
-            ObjectKind.MountType => _data.Mounts.ContainsKey(dataId.Id),
-            ObjectKind.Companion => _data.Companions.ContainsKey(dataId.Id),
-            ObjectKind.Ornament  => _data.Ornaments.ContainsKey(dataId.Id),
-            ObjectKind.BattleNpc => _data.BNpcs.ContainsKey(dataId.Id),
+            ObjectKind.MountType => data.Mounts.ContainsKey(dataId.Id),
+            ObjectKind.Companion => data.Companions.ContainsKey(dataId.Id),
+            ObjectKind.Ornament  => data.Ornaments.ContainsKey(dataId.Id),
+            ObjectKind.BattleNpc => data.BNpcs.ContainsKey(dataId.Id),
             _                    => false,
         };
     }
@@ -350,11 +393,11 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     public bool VerifyNpcData(ObjectKind kind, NpcId dataId)
         => kind switch
         {
-            ObjectKind.MountType => _data.Mounts.ContainsKey(dataId.Id),
-            ObjectKind.Companion => _data.Companions.ContainsKey(dataId.Id),
-            ObjectKind.Ornament  => _data.Ornaments.ContainsKey(dataId.Id),
-            ObjectKind.BattleNpc => _data.BNpcs.ContainsKey(dataId.Id),
-            ObjectKind.EventNpc  => _data.ENpcs.ContainsKey(dataId.Id),
+            ObjectKind.MountType => data.Mounts.ContainsKey(dataId.Id),
+            ObjectKind.Companion => data.Companions.ContainsKey(dataId.Id),
+            ObjectKind.Ornament  => data.Ornaments.ContainsKey(dataId.Id),
+            ObjectKind.BattleNpc => data.BNpcs.ContainsKey(dataId.Id),
+            ObjectKind.EventNpc  => data.ENpcs.ContainsKey(dataId.Id),
             _                    => false,
         };
 
@@ -383,7 +426,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         var nameId = actor.AsObject->BaseId == 952 ? 780 : actor.AsCharacter->NameId;
         if (ownerId != 0xE0000000)
         {
-            owner = HandleCutscene(_objects.ById(ownerId));
+            owner = HandleCutscene(objects.ById(ownerId));
             if (!owner.Valid)
                 return ActorIdentifier.Invalid;
 
@@ -425,7 +468,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         if (MannequinIds.Contains(dataId))
         {
             var retainerName = new ByteString(actor.AsObject->Name);
-            var actualName   = _framework.IsInFrameworkUpdateThread ? new ByteString(actor.AsObject->GetName()) : ByteString.Empty;
+            var actualName   = framework.IsInFrameworkUpdateThread ? new ByteString(actor.AsObject->GetName()) : ByteString.Empty;
             if (!actualName.Equals(retainerName))
             {
                 var ident = check
@@ -447,7 +490,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private ActorIdentifier CreateCompanionFromObject(Actor actor, out Actor owner, ObjectKind kind, bool check)
     {
-        owner = HandleCutscene(_objects.CompanionParent(actor));
+        owner = HandleCutscene(objects.CompanionParent(actor));
         if (!owner.Valid)
             return ActorIdentifier.Invalid;
 
@@ -507,8 +550,8 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         if (main.Index.Index is < (ushort)ScreenActor.CutsceneStart or >= (ushort)ScreenActor.CutsceneEnd)
             return main;
 
-        var parentIdx = _toParentIdx.Invoke(main.Index.Index);
-        var parent    = _objects[parentIdx];
+        var parentIdx = toParentIdx.Invoke(main.Index.Index);
+        var parent    = objects[parentIdx];
         return parent.Valid ? parent : main;
     }
 
@@ -542,8 +585,8 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             throw new IdentifierParseError($"The player string {parts[0]} contains invalid symbols.");
 
         var world = parts.Length == 2
-            ? _data.ToWorldId(parts[1])
-            : ushort.MaxValue;
+            ? data.ToWorldId(parts[1])
+            : WorldId.AnyWorld;
 
         if (!VerifyWorld(world))
             throw new IdentifierParseError($"{parts[1]} is not a valid world name.");
@@ -565,19 +608,19 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
 
         return split2[0].ToLowerInvariant() switch
         {
-            "m" or "mount" => FindDataId(split3[0], _data.Mounts, out var id)
+            "m" or "mount" => FindDataId(split3[0], data.Mounts, out var id)
                 ? (ObjectKind.MountType, mountId: id, GetIndex())
                 : throw new IdentifierParseError($"Could not identify a Mount named {split2[1]}."),
-            "c" or "companion" or "minion" or "mini" => FindDataId(split3[0], _data.Companions, out var id)
+            "c" or "companion" or "minion" or "mini" => FindDataId(split3[0], data.Companions, out var id)
                 ? (ObjectKind.Companion, cId: id, GetIndex())
                 : throw new IdentifierParseError($"Could not identify a Minion named {split2[1]}."),
-            "a" or "o" or "accessory" or "ornament" => FindDataId(split3[0], _data.Ornaments, out var id)
+            "a" or "o" or "accessory" or "ornament" => FindDataId(split3[0], data.Ornaments, out var id)
                 ? (ObjectKind.Ornament, id, GetIndex())
                 : throw new IdentifierParseError($"Could not identify an Accessory named {split2[1]}."),
-            "e" or "enpc" or "eventnpc" or "event npc" => FindDataId(split3[0], _data.ENpcs, out var id)
+            "e" or "enpc" or "eventnpc" or "event npc" => FindDataId(split3[0], data.ENpcs, out var id)
                 ? (ObjectKind.EventNpc, id, GetIndex())
                 : throw new IdentifierParseError($"Could not identify an Event NPC named {split2[1]}."),
-            "b" or "bnpc" or "battlenpc" or "battle npc" => FindDataId(split3[0], _data.BNpcs, out var id)
+            "b" or "bnpc" or "battlenpc" or "battle npc" => FindDataId(split3[0], data.BNpcs, out var id)
                 ? (ObjectKind.BattleNpc, id, GetIndex())
                 : throw new IdentifierParseError($"Could not identify a Battle NPC named {split2[1]}."),
             _ => throw new IdentifierParseError($"The argument {split2[0]} is not a valid NPC Type."),
@@ -589,7 +632,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             if (split3.Length != 2)
                 return idx;
 
-            if (ushort.TryParse(split3[1], out var intIdx) && intIdx < _objects.TotalCount)
+            if (ushort.TryParse(split3[1], out var intIdx) && intIdx < objects.TotalCount)
                 idx = intIdx;
             else
                 throw new IdentifierParseError($"Could not parse index {split3[1]} to valid Index.");

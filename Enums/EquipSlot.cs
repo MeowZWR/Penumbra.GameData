@@ -1,60 +1,145 @@
 using System.Collections.Frozen;
+using ImSharp;
+using Luna.Generators;
 
 namespace Penumbra.GameData.Enums;
 
 /// <summary> Equip Slot, mostly as defined by the games EquipSlotCategory. </summary>
+[NamedEnum]
 public enum EquipSlot : byte
 {
-    Unknown           = 0,
-    MainHand          = 1,
-    OffHand           = 2,
-    Head              = 3,
-    Body              = 4,
-    Hands             = 5,
-    Belt              = 6,
-    Legs              = 7,
-    Feet              = 8,
-    Ears              = 9,
-    Neck              = 10,
-    Wrists            = 11,
-    RFinger           = 12,
-    BothHand          = 13,
-    LFinger           = 14, // Not officially existing, means "weapon could be equipped in either hand" for the game.
-    HeadBody          = 15,
+    [Name("未知")]
+    Unknown = 0,
+
+    [Name("主手武器")]
+    MainHand = 1,
+
+    [Name("副手武器")]
+    OffHand = 2,
+
+    [Name("头部")]
+    Head = 3,
+
+    [Name("身体")]
+    Body = 4,
+
+    [Name("手臂")]
+    Hands = 5,
+
+    [Name("腰带")]
+    Belt = 6,
+
+    [Name("腿部")]
+    Legs = 7,
+
+    [Name("脚部")]
+    Feet = 8,
+
+    [Name("耳部")]
+    Ears = 9,
+
+    [Name("颈部")]
+    Neck = 10,
+
+    [Name("腕部")]
+    Wrists = 11,
+
+    [Name("右手戒指")]
+    RFinger = 12,
+
+    [Name("双手武器")]
+    BothHand = 13,
+
+    [Name("左手戒指")]
+    LFinger = 14, // Not officially existing, means "weapon could be equipped in either hand" for the game.
+
+    [Name("头部+身体")]
+    HeadBody = 15,
+
+    [Name("身体+手臂+腿部+脚部")]
     BodyHandsLegsFeet = 16,
-    SoulCrystal       = 17,
-    LegsFeet          = 18,
-    FullBody          = 19,
-    BodyHands         = 20,
-    BodyLegsFeet      = 21,
-    ChestHands        = 22,
-    ChestLegs         = 23,
-    Nothing           = 24,
-    All               = 25, // Not officially existing
+
+    [Name("灵魂水晶")]
+    SoulCrystal = 17,
+
+    [Name("腿部+脚部")]
+    LegsFeet = 18,
+
+    [Name("身体+手臂+腿部")]
+    FullBody = 19,
+
+    [Name("身体+手臂")]
+    BodyHands = 20,
+
+    [Name("身体+腿部+脚部")]
+    BodyLegsFeet = 21,
+
+    [Name("胸部+手臂")]
+    ChestHands = 22,
+
+    [Name("胸部+腿部")]
+    ChestLegs = 23,
+
+    [Name("未知")]
+    Nothing = 24,
+
+    [Name("全部（比如幽灵套装）")]
+    All = 25, // Not officially existing
 }
 
+[NamedEnum]
 public enum HumanSlot : uint
 {
-    Head     = 0,
-    Body     = 1,
-    Hands    = 2,
-    Legs     = 3,
-    Feet     = 4,
-    Ears     = 5,
-    Neck     = 6,
-    Wrists   = 7,
-    RFinger  = 8,
-    LFinger  = 9,
-    Hair     = 10,
-    Face     = 11,
-    Ear      = 12,
-    Glasses  = 16,
+    [Name("头部")]
+    Head = 0,
+
+    [Name("身体")]
+    Body = 1,
+
+    [Name("手臂")]
+    Hands = 2,
+
+    [Name("腿部")]
+    Legs = 3,
+
+    [Name("脚部")]
+    Feet = 4,
+
+    [Name("耳部")]
+    Ears = 5,
+
+    [Name("颈部")]
+    Neck = 6,
+
+    [Name("腕部")]
+    Wrists = 7,
+
+    [Name("右手戒指")]
+    RFinger = 8,
+
+    [Name("左手戒指")]
+    LFinger = 9,
+
+    [Name("头发")]
+    Hair = 10,
+
+    [Name("面部")]
+    Face = 11,
+
+    [Name("耳朵")]
+    Ear = 12,
+
+    [Name("眼镜")]
+    Glasses = 16,
+
+    [Name("未知额外物品")]
     UnkBonus = 17,
 
+    [Name("未知")]
     Unknown = uint.MaxValue,
 }
 
-public static class EquipSlotExtensions
+public static partial class EquipSlotExtensions
 {
     /// <summary> Convert the integer to the EquipSlot it is used to represent in most model code. </summary>
     public static EquipSlot ToEquipSlot(this uint value)
@@ -115,29 +200,6 @@ public static class EquipSlotExtensions
             _                  => (false, -1),
         };
         return ret;
-    }
-
-    public static string ToName(this HumanSlot slot)
-    {
-        return slot switch
-        {
-            HumanSlot.Head     => EquipSlot.Head.ToName(),
-            HumanSlot.Body     => EquipSlot.Body.ToName(),
-            HumanSlot.Hands    => EquipSlot.Hands.ToName(),
-            HumanSlot.Legs     => EquipSlot.Legs.ToName(),
-            HumanSlot.Feet     => EquipSlot.Feet.ToName(),
-            HumanSlot.Ears     => EquipSlot.Ears.ToName(),
-            HumanSlot.Neck     => EquipSlot.Neck.ToName(),
-            HumanSlot.Wrists   => EquipSlot.Wrists.ToName(),
-            HumanSlot.RFinger  => EquipSlot.RFinger.ToName(),
-            HumanSlot.LFinger  => EquipSlot.LFinger.ToName(),
-            HumanSlot.Glasses  => BonusItemFlag.Glasses.ToName(),
-            HumanSlot.UnkBonus => "Unk Bonus",
-            HumanSlot.Hair     => BodySlot.Hair.ToString(),
-            HumanSlot.Face     => BodySlot.Face.ToString(),
-            HumanSlot.Ear      => BodySlot.Ear.ToString(),
-            _                  => "Unknown",
-        };
     }
 
     public static object? ToSpecificEnum(this HumanSlot slot)
@@ -250,36 +312,6 @@ public static class EquipSlotExtensions
             _                           => EquipSlot.Unknown,
         };
 
-    /// <summary> Translate an EquipSlotCategory into a human readable name.  </summary>
-    public static string ToName(this EquipSlot value)
-        => value switch
-        {
-            EquipSlot.Head              => "头部",
-            EquipSlot.Hands             => "手臂",
-            EquipSlot.Legs              => "腿部",
-            EquipSlot.Feet              => "脚部",
-            EquipSlot.Body              => "身体",
-            EquipSlot.Ears              => "耳环",
-            EquipSlot.Neck              => "项链",
-            EquipSlot.RFinger           => "右手戒指",
-            EquipSlot.LFinger           => "左手戒指",
-            EquipSlot.Wrists            => "手镯",
-            EquipSlot.MainHand          => "主手",
-            EquipSlot.OffHand           => "副手",
-            EquipSlot.Belt              => "腰带",
-            EquipSlot.BothHand          => "双手武器",
-            EquipSlot.HeadBody          => "头部+身体",
-            EquipSlot.BodyHandsLegsFeet => "身体+手臂+腿部+脚部",
-            EquipSlot.SoulCrystal       => "灵魂水晶",
-            EquipSlot.LegsFeet          => "腿部+脚部",
-            EquipSlot.FullBody          => "身体+手臂+腿部",
-            EquipSlot.BodyHands         => "身体+手臂",
-            EquipSlot.BodyLegsFeet      => "身体+腿部+脚部",
-            EquipSlot.ChestLegs         => "身体+腿部",
-            EquipSlot.All               => "全部（比如幽灵套装）",
-            _                           => "未知",
-        };
-
     /// <summary> Returns true for the 5 primary equipment slots. </summary>
     public static bool IsEquipment(this EquipSlot value)
     {
@@ -337,10 +369,10 @@ public static class EquipSlotExtensions
     }
 
     /// <summary> A list of all primary equipment pieces. </summary>
-    public static readonly IReadOnlyList<EquipSlot> EquipmentSlots = Enum.GetValues<EquipSlot>().Where(e => e.IsEquipment()).ToArray();
+    public static readonly IReadOnlyList<EquipSlot> EquipmentSlots = EquipSlot.Values.Where(e => e.IsEquipment()).ToArray();
 
     /// <summary> A list of all secondary equipment pieces. </summary>
-    public static readonly IReadOnlyList<EquipSlot> AccessorySlots = Enum.GetValues<EquipSlot>().Where(e => e.IsAccessory()).ToArray();
+    public static readonly IReadOnlyList<EquipSlot> AccessorySlots = EquipSlot.Values.Where(e => e.IsAccessory()).ToArray();
 
     /// <summary> A list of all primary and secondary equipment pieces. </summary>
     public static readonly IReadOnlyList<EquipSlot> EqdpSlots = EquipmentSlots.Concat(AccessorySlots).ToArray();
