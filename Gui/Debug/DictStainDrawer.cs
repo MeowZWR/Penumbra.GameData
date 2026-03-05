@@ -21,7 +21,7 @@ public class DictStainDrawer(DictStain stains) : IGameDataDrawer
     public void Draw()
     {
         const TableFlags flags       = TableFlags.RowBackground | TableFlags.ScrollY | TableFlags.BordersOuter | TableFlags.SizingFixedFit;
-        var              resetScroll = _filter.DrawFilter("Filter..."u8, Im.ContentRegion.Available);
+        var              resetScroll = _filter.DrawFilter("筛选..."u8, Im.ContentRegion.Available);
         var              height      = Im.Style.TextHeightWithSpacing + 2 * Im.Style.CellPadding.Y;
         using var        table       = Im.Table.Begin("##table"u8, 4, flags, new Vector2(Im.ContentRegion.Available.X, 10 * height));
         if (!table)

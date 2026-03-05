@@ -16,7 +16,7 @@ public class DataServiceDiagnosticsDrawer(ServiceManager manager) : IGameDataDra
     /// <inheritdoc/>
     public void Draw()
     {
-        Im.Input.Text("##filter"u8, ref _filter, "Filter..."u8);
+        Im.Input.Text("##filter"u8, ref _filter, "筛选..."u8);
         DrawSortCombo();
         using var table = Im.Table.Begin("services"u8, 5, TableFlags.SizingFixedFit | TableFlags.RowBackground);
         if (!table)

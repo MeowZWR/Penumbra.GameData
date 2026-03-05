@@ -37,7 +37,7 @@ public class ActorDataDrawer(NameDicts dicts, DictBNpcNames bNpcNames) : IGameDa
         if (!tree)
             return;
 
-        var resetScroll = Im.Input.Text("##filter"u8, ref _bNpcFilter, "Filter..."u8);
+        var resetScroll = Im.Input.Text("##filter"u8, ref _bNpcFilter, "筛选..."u8);
         var height      = Im.Style.TextHeightWithSpacing + 2 * Im.Style.CellPadding.Y;
         using var table = Im.Table.Begin("##table"u8, 3, TableFlags.RowBackground | TableFlags.ScrollY | TableFlags.BordersOuter,
             new Vector2(-1, 10 * height));

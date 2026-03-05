@@ -18,7 +18,7 @@ public static class DebugUtility
             return;
 
         using var _           = Im.Id.Push(ref label);
-        var       resetScroll = Im.Input.Text("##filter"u8, ref filter, "Filter..."u8);
+        var       resetScroll = Im.Input.Text("##filter"u8, ref filter, "筛选..."u8);
         var       height      = Im.Style.TextHeightWithSpacing+ 2 * Im.Style.CellPadding.Y;
         using var table = Im.Table.Begin("##table"u8, 2, TableFlags.RowBackground | TableFlags.ScrollY | TableFlags.BordersOuter,
             new Vector2(-1, 10 * height));

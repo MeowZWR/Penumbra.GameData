@@ -44,7 +44,7 @@ public sealed class NameDicts(
     /// <summary> Return the world name including the Any World option. </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public string ToWorldName(WorldId worldId)
-        => worldId == WorldId.AnyWorld ? "Any World" : Worlds.GetValueOrDefault(worldId, "Invalid");
+        => worldId == WorldId.AnyWorld ? "任意世界" : Worlds.GetValueOrDefault(worldId, "无效");
 
     /// <summary> Return the world id corresponding to the given name. </summary>
     /// <returns> ushort.MaxValue if the name is empty, 0 if it is not a valid world, or the worlds' id. </returns>

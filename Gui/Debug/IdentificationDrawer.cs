@@ -69,7 +69,7 @@ public class IdentificationDrawer(
         ImEx.TextFrameAligned("Parse Game Path"u8);
         Im.Line.SameInner();
         Im.Item.SetNextWidthScaled(300);
-        Im.Input.Text("##gamePath"u8, ref _gamePath, "Enter game path..."u8);
+        Im.Input.Text("##gamePath"u8, ref _gamePath, "输入游戏路径..."u8);
         var fileInfo = gamePathParser.GetFileInfo(_gamePath);
         Im.Text(
             $"{fileInfo.ObjectType} {fileInfo.EquipSlot} {fileInfo.PrimaryId} {fileInfo.SecondaryId} {fileInfo.Variant} {fileInfo.BodySlot} {fileInfo.CustomizationType}");
@@ -98,7 +98,7 @@ public class IdentificationDrawer(
         if (!tree)
             return;
 
-        var resetScroll = Im.Input.Text("##filter"u8, ref filter, "Filter..."u8);
+        var resetScroll = Im.Input.Text("##filter"u8, ref filter, "筛选..."u8);
         ImEx.TextFrameAligned("From"u8);
         Im.Line.SameInner();
         float width;
@@ -158,7 +158,7 @@ public class IdentificationDrawer(
         if (!tree)
             return;
 
-        var resetScroll = Im.Input.Text("##filter"u8, ref filter, "Filter..."u8);
+        var resetScroll = Im.Input.Text("##filter"u8, ref filter, "筛选..."u8);
         var height      = Im.Style.TextHeightWithSpacing + 2 * Im.Style.CellPadding.Y;
         using var table = Im.Table.Begin("##table"u8, 2, TableFlags.RowBackground | TableFlags.ScrollY | TableFlags.BordersOuter,
             new Vector2(-1, 10 * height));

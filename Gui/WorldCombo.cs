@@ -8,7 +8,7 @@ namespace Penumbra.GameData.Gui;
 public sealed class WorldCombo(DictWorld worlds) : SimpleFilterCombo<KeyValuePair<WorldId, string>>(SimpleFilterType.Text)
 {
     /// <summary> Always the first entry that can be selected. </summary>
-    private const string AnyWorldString = "Any World";
+    private const string AnyWorldString = "任意世界";
 
     private KeyValuePair<WorldId, string> _selected = new(WorldId.AnyWorld, AnyWorldString);
 
