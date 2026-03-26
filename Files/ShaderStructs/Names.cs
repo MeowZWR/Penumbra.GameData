@@ -66,6 +66,9 @@ public static class Names
             ShpkFile.TableSamplerName,
             ShpkFile.NormalSamplerName,
             ShpkFile.IndexSamplerName,
+            ShpkFile.DiffuseSamplerName,
+            ShpkFile.SpecularSamplerName,
+            ShpkFile.MaskSamplerName,
 
             // Special material constants
             SphereMapIndexConstantName,
@@ -405,6 +408,35 @@ public static class Names
             "PASS_WATER_Z",
             "PASS_WIREFRAME",
             "PASS_Z_OPAQUE",
+
+            // Shader parameter map columns
+            "BackScatterPower",
+            "FurLength",
+            "HairBackScatterRoughnessOffsetRate",
+            "HairRoughnessOffsetRate",
+            "HairScatterColorShift",
+            "HairSecondaryRoughnessOffsetRate",
+            "HairSpecularBackScatterShift",
+            "HairSpecularPrimaryShift",
+            "HairSpecularSecondaryShift",
+            "HairSpecularShift",
+            "Reserve",
+            "SheenAperture",
+            "SheenRate",
+            "SheenTintRate",
+            "SubSurfacePower",
+            "SubSurfaceProfileID",
+            "SubSurfaceWidth",
+            "UseSubSurfaceRate",
+
+            // Shader parameter map tables
+            "BG",
+            "CHARA",
+            "COMMON",
+
+            // Shader parameter map values
+            "DEFAULT",
+            "LEGACY",
         ];
 
     private static IReadOnlyList<string> GetKnownSuffixes()
