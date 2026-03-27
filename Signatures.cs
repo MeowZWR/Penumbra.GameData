@@ -8,6 +8,7 @@ public static class Sigs
 {
     // ObjectManager
     public const string UpdateObjectArrays = "40 57 48 83 EC ?? 48 89 5C 24 ?? 33 DB";
+    public const string UpdateMinion       = "E8 ?? ?? ?? ?? 84 C0 75 ?? 48 8B 4B ?? 33 FF";
 
     // ResourceLoader.Replacement
     public const string GetResourceSync  = "E8 ?? ?? ?? ?? 48 8B C8 8B C3 F0 0F C0 81";
@@ -61,7 +62,7 @@ public static class Sigs
     public const string UnkMountAnimation =
         "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 54 41 56 41 57 48 83 EC ?? 45 8B F9";
 
-    public const string UnkParasolAnimation = "E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 84 C0 0F 84 ?? ?? ?? ?? 41 83 BE";
+    public const string UnkParasolAnimation = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 8B FA 4C 8B F1";
     public const string Dismount = "E8 ?? ?? ?? ?? 48 8B 4F ?? F6 81";
     public const string GetCachedScheduleResource = "40 53 48 83 EC ?? 44 8B 4A";
     public const string LoadActionTmb = "E8 ?? ?? ?? ?? 48 89 43 ?? 0F B6 45";
