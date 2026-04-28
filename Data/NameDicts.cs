@@ -58,7 +58,7 @@ public sealed class NameDicts(
     /// <returns> Invalid or a valid name. </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public string ToName(ObjectKind kind, NpcId dataId)
-        => TryGetName(kind, dataId, out var ret) ? ret : "Invalid";
+        => TryGetName(kind, dataId, out var ret) ? ret : "无效";
 
     /// <summary> Convert a given ID for a certain ObjectKind to a name. </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

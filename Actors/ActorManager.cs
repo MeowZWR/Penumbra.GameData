@@ -101,7 +101,7 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
         return id.Type switch
         {
             IdentifierType.Player => id.HomeWorld.Id != _homeWorld
-                ? $"{id.PlayerName}（{Data.ToWorldName(id.HomeWorld)}）"
+                ? $"{id.PlayerName} ({Data.ToWorldName(id.HomeWorld)})"
                 : id.PlayerName.ToString(),
             IdentifierType.Retainer => $"{id.PlayerName}{id.Retainer switch
             {
@@ -110,8 +110,8 @@ public sealed class ActorManager : ActorIdentifierFactory, IDisposable, IAsyncSe
                 _                                      => "（雇员）",
             }}",
             IdentifierType.Owned => id.HomeWorld.Id != _homeWorld
-                ? $"{id.PlayerName}（{Data.ToWorldName(id.HomeWorld)}）{possessive}{Data.ToName(id.Kind, id.DataId)}"
-                : $"{id.PlayerName}{possessive}{Data.ToName(id.Kind, id.DataId)}",
+                ? $"{id.PlayerName} ({Data.ToWorldName(id.HomeWorld)}){possessive}{Data.ToName(id.Kind, id.DataId)}"
+                : $"{id.PlayerName}{possessive}{Data.ToName(id.Kind,                           id.DataId)}",
             IdentifierType.Special => ((ScreenActor)id.Index.Index).ToName(),
             IdentifierType.Npc =>
                 id.Index == ushort.MaxValue

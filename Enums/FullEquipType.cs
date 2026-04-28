@@ -13,145 +13,210 @@ public enum FullEquipType : byte
 
     [Name("头部")]
     Head,
+
     [Name("身体")]
     Body,
+
     [Name("手臂")]
     Hands,
+
     [Name("腿部")]
     Legs,
+
     [Name("脚部")]
     Feet,
 
     [Name("耳部")]
     Ears,
+
     [Name("颈部")]
     Neck,
+
     [Name("腕部")]
     Wrists,
+
     [Name("戒指")]
     Finger,
 
     [Name("格斗武器")]
     Fists, // PGL, MNK
+
     [Name("格斗武器（副手）")]
     FistsOff,
+
     [Name("单手剑")]
     Sword, // GLA, PLD Main
+
     [Name("大斧")]
-    Axe,   // MRD, WAR
+    Axe, // MRD, WAR
+
     [Name("弓")]
-    Bow,   // ARC, BRD
+    Bow, // ARC, BRD
+
     [Name("箭袋")]
     BowOff,
+
     [Name("长枪")]
-    Lance,   // LNC, DRG,
+    Lance, // LNC, DRG,
+
     [Name("双手杖")]
-    Staff,   // THM, BLM, CNJ, WHM
+    StaffBlm, // THM, BLM,
+
     [Name("单手杖")]
-    Wand,    // THM, BLM, CNJ, WHM Main
+    Wand, // CNJ, WHM Main
+
     [Name("魔导书")]
-    Book,    // ACN, SMN, SCH
+    Book, // ACN, SMN, SCH
+
     [Name("双剑")]
     Daggers, // ROG, NIN
+
     [Name("双剑（副手）")]
     DaggersOff,
+
     [Name("双手剑")]
     Broadsword, // DRK,
+
     [Name("火枪")]
-    Gun,        // MCH,
+    Gun, // MCH,
+
     [Name("以太变换器")]
     GunOff,
+
     [Name("天球仪")]
     Orrery, // AST,
+
     [Name("卡套")]
     OrreryOff,
+
     [Name("武士刀")]
     Katana, // SAM
+
     [Name("刀鞘")]
     KatanaOff,
+
     [Name("刺剑")]
     Rapier, // RDM
+
     [Name("触媒")]
     RapierOff,
+
     [Name("青魔杖")]
-    Cane,     // BLU
+    Cane, // BLU
+
     [Name("枪刃")]
     Gunblade, // GNB,
+
     [Name("投掷武器")]
-    Glaives,  // DNC,
+    Glaives, // DNC,
+
     [Name("投掷武器（副手）")]
     GlaivesOff,
+
     [Name("镰刀")]
-    Scythe,   // RPR,
+    Scythe, // RPR,
+
     [Name("贤具")]
     Nouliths, // SGE
+
     [Name("盾")]
-    Shield,   // GLA, PLD, THM, BLM, CNJ, WHM Off
+    Shield, // GLA, PLD, THM, BLM, CNJ, WHM Off
 
     [Name("刻木工具")]
-    Saw,             // CRP
+    Saw, // CRP
+
     [Name("锻铁工具")]
     CrossPeinHammer, // BSM
+
     [Name("铸甲工具")]
-    RaisingHammer,   // ARM
+    RaisingHammer, // ARM
+
     [Name("雕金工具")]
-    LapidaryHammer,  // GSM
+    LapidaryHammer, // GSM
+
     [Name("制革工具")]
-    Knife,           // LTW
+    Knife, // LTW
+
     [Name("裁衣工具")]
-    Needle,          // WVR
+    Needle, // WVR
+
     [Name("炼金工具")]
-    Alembic,         // ALC
+    Alembic, // ALC
+
     [Name("烹调工具")]
-    Frypan,          // CUL
+    Frypan, // CUL
+
     [Name("采矿工具")]
-    Pickaxe,         // MIN
+    Pickaxe, // MIN
+
     [Name("园艺工具")]
-    Hatchet,         // BTN
+    Hatchet, // BTN
+
     [Name("捕鱼用具")]
-    FishingRod,      // FSH
+    FishingRod, // FSH
 
     [Name("羊角锤")]
-    ClawHammer,    // CRP Off
+    ClawHammer, // CRP Off
+
     [Name("锉刀")]
-    File,          // BSM Off
+    File, // BSM Off
+
     [Name("手钳")]
-    Pliers,        // ARM Off
+    Pliers, // ARM Off
+
     [Name("砂轮机")]
     GrindingWheel, // GSM Off
+
     [Name("平斩")]
-    Awl,           // LTW Off
+    Awl, // LTW Off
+
     [Name("纺车")]
     SpinningWheel, // WVR Off
+
     [Name("研钵")]
-    Mortar,        // ALC Off
+    Mortar, // ALC Off
+
     [Name("厨刀")]
     CulinaryKnife, // CUL Off
+
     [Name("碎石锤")]
-    Sledgehammer,  // MIN Off
+    Sledgehammer, // MIN Off
+
     [Name("园艺镰刀")]
-    GardenScythe,  // BTN Off
+    GardenScythe, // BTN Off
+
     [Name("渔叉")]
-    Gig,           // FSH Off
+    Gig, // FSH Off
 
     [Name("笔刷")]
-    Brush,        // PCT
+    Brush, // PCT
+
     [Name("调色盘")]
-    Palette,      // PCT Off
+    Palette, // PCT Off
+
     [Name("双剑")]
-    Twinfangs,    // VPR
+    Twinfangs, // VPR
+
     [Name("双剑（副手）")]
     TwinfangsOff, // VPR Off
-    [Name("鞭子")]
-    Whip,         // BMR TODO
+
+    [Name("单手斧")]
+    Handaxe, // BST TODO
 
     [Name("眼镜")]
     Glasses,
 
     [Name("主手武器")]
     UnknownMainhand,
+
     [Name("副手武器")]
     UnknownOffhand,
+
+    [Name("双手咒杖")]
+    StaffWhm, // CNJ, WHM
+
+    [Name("单手咒杖")]
+    Scepter, // THM, BLM, Main
 }
 
 public static partial class FullEquipTypeExtensions
@@ -177,7 +242,8 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Axe             => true,
             FullEquipType.Bow             => true,
             FullEquipType.Lance           => true,
-            FullEquipType.Staff           => true,
+            FullEquipType.StaffBlm        => true,
+            FullEquipType.StaffWhm        => true,
             FullEquipType.Wand            => true,
             FullEquipType.Book            => true,
             FullEquipType.Daggers         => true,
@@ -187,6 +253,7 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Katana          => true,
             FullEquipType.Rapier          => true,
             FullEquipType.Cane            => true,
+            FullEquipType.Scepter         => true,
             FullEquipType.Gunblade        => true,
             FullEquipType.Glaives         => true,
             FullEquipType.Scythe          => true,
@@ -194,8 +261,47 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Shield          => true,
             FullEquipType.Brush           => true,
             FullEquipType.Twinfangs       => true,
+            FullEquipType.Handaxe         => true,
             FullEquipType.UnknownMainhand => true,
             _                             => false,
+        };
+
+    /// <summary> Return whether two weapon types are compatible. </summary>
+    public static bool IsCompatible(this FullEquipType type, FullEquipType other)
+        => type switch
+        {
+            FullEquipType.Scepter or FullEquipType.Wand or FullEquipType.StaffWhm or FullEquipType.StaffBlm => other is FullEquipType.Scepter
+                or FullEquipType.Wand or FullEquipType.StaffBlm or FullEquipType.StaffWhm,
+            _ => type == other,
+        };
+
+    /// <summary> Return whether an offhand weapon type is compatible with the current mainhand state. </summary>
+    /// <param name="type"> The new offhand item's type. </param>
+    /// <param name="gameMainhand"> The game's mainhand type. </param>
+    /// <param name="actualMainhand"> The current actual mainhand type. </param>
+    /// <param name="gameOffhand"> The game's offhand type. </param>
+    /// <returns> True whether the new item can be applied to the offhand. </returns>
+    public static bool IsOffhandCompatible(this FullEquipType type, FullEquipType gameMainhand, FullEquipType actualMainhand,
+        FullEquipType gameOffhand)
+    {
+        // If the mainhand type is the default one, just check against the default offhand.
+        if (gameMainhand == actualMainhand)
+            return type.IsCompatible(gameOffhand);
+
+        // Otherwise check against the expected offhand.
+        var validOffhand = actualMainhand.ValidOffhand();
+        return type.IsCompatible(validOffhand);
+    }
+
+    /// <summary> Get all compatible types for a weapon type, excluding itself. </summary>
+    public static IReadOnlyList<FullEquipType> CompatibleTypes(this FullEquipType type)
+        => type switch
+        {
+            FullEquipType.Scepter  => [FullEquipType.Wand, FullEquipType.StaffWhm, FullEquipType.StaffBlm],
+            FullEquipType.Wand     => [FullEquipType.Scepter, FullEquipType.StaffWhm, FullEquipType.StaffBlm],
+            FullEquipType.StaffWhm => [FullEquipType.Scepter, FullEquipType.Wand, FullEquipType.StaffBlm],
+            FullEquipType.StaffBlm => [FullEquipType.Scepter, FullEquipType.Wand, FullEquipType.StaffWhm],
+            _                      => [],
         };
 
     /// <summary> Return whether a FullEquipType is a primary or secondary tool. </summary>
@@ -285,7 +391,8 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Bow             => EquipSlot.MainHand,
             FullEquipType.BowOff          => EquipSlot.OffHand,
             FullEquipType.Lance           => EquipSlot.MainHand,
-            FullEquipType.Staff           => EquipSlot.MainHand,
+            FullEquipType.StaffBlm        => EquipSlot.MainHand,
+            FullEquipType.StaffWhm        => EquipSlot.MainHand,
             FullEquipType.Wand            => EquipSlot.MainHand,
             FullEquipType.Book            => EquipSlot.MainHand,
             FullEquipType.Daggers         => EquipSlot.MainHand,
@@ -300,6 +407,7 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Rapier          => EquipSlot.MainHand,
             FullEquipType.RapierOff       => EquipSlot.OffHand,
             FullEquipType.Cane            => EquipSlot.MainHand,
+            FullEquipType.Scepter         => EquipSlot.MainHand,
             FullEquipType.Gunblade        => EquipSlot.MainHand,
             FullEquipType.Glaives         => EquipSlot.MainHand,
             FullEquipType.GlaivesOff      => EquipSlot.OffHand,
@@ -332,7 +440,7 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.TwinfangsOff    => EquipSlot.OffHand,
             FullEquipType.Brush           => EquipSlot.MainHand,
             FullEquipType.Palette         => EquipSlot.OffHand,
-            FullEquipType.Whip            => EquipSlot.MainHand,
+            FullEquipType.Handaxe         => EquipSlot.MainHand,
             FullEquipType.Glasses         => BonusItemFlag.Glasses.ToEquipSlot(),
             FullEquipType.UnknownMainhand => EquipSlot.MainHand,
             FullEquipType.UnknownOffhand  => EquipSlot.OffHand,
@@ -391,10 +499,10 @@ public static partial class FullEquipTypeExtensions
             WeaponCategory.Archer when mainhand      => FullEquipType.Bow,
             WeaponCategory.Archer                    => FullEquipType.BowOff,
             WeaponCategory.Lancer                    => FullEquipType.Lance,
-            WeaponCategory.Thaumaturge1              => FullEquipType.Wand,
-            WeaponCategory.Thaumaturge2              => FullEquipType.Staff,
+            WeaponCategory.Thaumaturge1              => FullEquipType.Scepter,
+            WeaponCategory.Thaumaturge2              => FullEquipType.StaffBlm,
             WeaponCategory.Conjurer1                 => FullEquipType.Wand,
-            WeaponCategory.Conjurer2                 => FullEquipType.Staff,
+            WeaponCategory.Conjurer2                 => FullEquipType.StaffWhm,
             WeaponCategory.Arcanist                  => FullEquipType.Book,
             WeaponCategory.Shield                    => FullEquipType.Shield,
             WeaponCategory.CarpenterMain             => FullEquipType.Saw,
@@ -441,7 +549,7 @@ public static partial class FullEquipTypeExtensions
             WeaponCategory.Viper                     => FullEquipType.TwinfangsOff,
             WeaponCategory.Pictomancer when mainhand => FullEquipType.Brush,
             WeaponCategory.Pictomancer               => FullEquipType.Palette,
-            WeaponCategory.Beastmaster               => FullEquipType.Whip,
+            WeaponCategory.Beastmaster               => FullEquipType.Handaxe,
             _ when mainhand                          => FullEquipType.UnknownMainhand,
             _                                        => FullEquipType.UnknownOffhand,
         };
@@ -453,6 +561,8 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Fists     => FullEquipType.FistsOff,
             FullEquipType.Sword     => FullEquipType.Shield,
             FullEquipType.Wand      => FullEquipType.Shield,
+            FullEquipType.Scepter   => FullEquipType.Shield,
+            FullEquipType.Handaxe   => FullEquipType.Shield,
             FullEquipType.Daggers   => FullEquipType.DaggersOff,
             FullEquipType.Gun       => FullEquipType.GunOff,
             FullEquipType.Orrery    => FullEquipType.OrreryOff,
@@ -472,6 +582,8 @@ public static partial class FullEquipTypeExtensions
             FullEquipType.Fists           => FullEquipType.FistsOff,
             FullEquipType.Sword           => FullEquipType.Shield,
             FullEquipType.Wand            => FullEquipType.Shield,
+            FullEquipType.Scepter         => FullEquipType.Shield,
+            FullEquipType.Handaxe         => FullEquipType.Shield,
             FullEquipType.Daggers         => FullEquipType.DaggersOff,
             FullEquipType.Gun             => FullEquipType.GunOff,
             FullEquipType.Orrery          => FullEquipType.OrreryOff,
