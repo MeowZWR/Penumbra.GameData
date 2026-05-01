@@ -35,6 +35,10 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, LunaLogge
         if (world.IsPublic)
             return true;
 
+        // 国服等非 IsPublic 但 UserType 与 RowId 符合的区服
+        if (world.RowId > 1000 && (world.UserType is 101 or 2))
+            return true;
+
         return char.IsUpper((char)world.Name.Data.Span[0]);
     }
 
