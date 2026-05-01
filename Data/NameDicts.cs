@@ -58,7 +58,7 @@ public sealed class NameDicts(
     /// <returns> Invalid or a valid name. </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public string ToName(ObjectKind kind, NpcId dataId)
-        => TryGetName(kind, dataId, out var ret) ? ret : "Invalid";
+        => TryGetName(kind, dataId, out var ret) ? ret : "无效";
 
     /// <summary> Convert a given ID for a certain ObjectKind to a name. </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -67,7 +67,7 @@ public sealed class NameDicts(
         name = null;
         return kind switch
         {
-            ObjectKind.MountType => Mounts.TryGetValue(dataId.MountId, out name),
+            ObjectKind.Mount     => Mounts.TryGetValue(dataId.MountId, out name),
             ObjectKind.Companion => Companions.TryGetValue(dataId.CompanionId, out name),
             ObjectKind.Ornament  => Ornaments.TryGetValue(dataId.OrnamentId, out name),
             ObjectKind.BattleNpc => BNpcs.TryGetValue(dataId.BNpcNameId, out name),

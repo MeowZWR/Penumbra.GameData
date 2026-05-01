@@ -76,7 +76,7 @@ public enum CustomizeIndex : byte
     [Name("左眼")]
     EyeColorLeft,
 
-    [Name("小瞳孔")]
+    [Name("较小瞳孔")]
     EyeShape,
 
     [Name("较小眼瞳")]

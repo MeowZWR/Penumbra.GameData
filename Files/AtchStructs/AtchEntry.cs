@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Luna;
 using Newtonsoft.Json.Linq;
 using Penumbra.String;
@@ -41,8 +42,24 @@ public unsafe struct AtchEntry : IEquatable<AtchEntry>
         }
     }
 
-    public string BoneAsString()
-        => Encoding.UTF8.GetString(Bone);
+    public void WriteJson(Utf8JsonWriter j)
+    {
+        j.WriteStartObject();
+        AddToJson(j);
+        j.WriteEndObject();
+    }
+
+    public void AddToJson(Utf8JsonWriter j)
+    {
+        j.WriteString("Bone"u8, Bone);
+        j.WriteNumber("Scale"u8, Scale);
+        j.WriteNumber("OffsetX"u8, OffsetX);
+        j.WriteNumber("OffsetY"u8, OffsetY);
+        j.WriteNumber("OffsetZ"u8, OffsetZ);
+        j.WriteNumber("RotationX"u8, RotationX);
+        j.WriteNumber("RotationY"u8, RotationY);
+        j.WriteNumber("RotationZ"u8, RotationZ);
+    }
 
     public JObject ToJson()
         => new()
@@ -76,6 +93,9 @@ public unsafe struct AtchEntry : IEquatable<AtchEntry>
         ret.RotationZ = obj["RotationZ"]?.ToObject<float>() ?? 0;
         return ret;
     }
+
+    public string BoneAsString()
+        => Encoding.UTF8.GetString(Bone);
 
     public bool SetBoneName(ReadOnlySpan<byte> text)
     {
