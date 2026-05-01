@@ -21,13 +21,13 @@ public sealed class RestrictedItemsRace(IDalamudPluginInterface pluginInterface,
 
         var items      = gameData.GetExcelSheet<Item>();
         var categories = gameData.GetExcelSheet<EquipRaceCategory>(gameData.Language);
-        foreach (var item in items.Where(i => i.EquipRestriction > 3))
+        foreach (var item in items.Where(i => i.EquipRestriction.RowId > 3))
         {
             if (ret.Contains((uint)item.ModelMain))
                 continue;
 
             log.Information(
-                $"{item.RowId:D5} {item.Name} has unknown restriction group {categories.GetRow(item.EquipRestriction).RowId:D2}.");
+                $"{item.RowId:D5} {item.Name} has unknown restriction group {categories.GetRow(item.EquipRestriction.RowId).RowId:D2}.");
         }
 
         return ret.ToFrozenSet();

@@ -41,7 +41,7 @@ public static class ActorIdentifierExtensions
             ObjectKind.None      => "未知",
             ObjectKind.BattleNpc => "战斗NPC",
             ObjectKind.EventNpc  => "事件NPC",
-            ObjectKind.MountType => "坐骑",
+            ObjectKind.Mount => "坐骑",
             ObjectKind.Companion => "宠物",
             ObjectKind.Ornament  => "时尚配饰",
             _                    => kind.ToString(),

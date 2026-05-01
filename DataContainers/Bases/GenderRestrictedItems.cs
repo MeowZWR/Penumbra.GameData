@@ -18,7 +18,7 @@ public static class GenderRestrictedItems
     internal static void AddUnknownItems(Dictionary<uint, uint> dict, ExcelSheet<Item> items, Logger log, byte restriction)
     {
         var unhandled = 0;
-        foreach (var item in items.Where(i => i.EquipRestriction == restriction && i.EquipSlotCategory.RowId > 0))
+        foreach (var item in items.Where(i => i.EquipRestriction.RowId == restriction && i.EquipSlotCategory.RowId > 0))
         {
             // Skip Scion Chronocler's Ringbands and Scion Thaumaturge's Moccasins as they are not actually restricted.
             if (item.RowId is 13700 or 13699)
@@ -91,7 +91,7 @@ public static class GenderRestrictedItems
             return;
         }
 
-        if (sourceRow.EquipRestriction != restriction)
+        if (sourceRow.EquipRestriction.RowId != restriction)
         {
             log.Warning($"{sourceRow.Name.ExtractTextExtended()} is not restricted anymore.");
             return;
