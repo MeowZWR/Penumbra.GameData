@@ -37,46 +37,46 @@ public enum EquipFlag : uint
 [NamedEnum("ToLabel", Class: nameof(EquipFlagExtensions))]
 public enum CombinedItemSlotFlag : uint
 {
-    [Name("Head")]
+    [Name("头部")]
     Head = 0x0001,
 
-    [Name("Body")]
+    [Name("身体")]
     Body = 0x0002,
 
-    [Name("Hands")]
+    [Name("手臂")]
     Hands = 0x0004,
 
-    [Name("Legs")]
+    [Name("腿部")]
     Legs = 0x0008,
 
-    [Name("Feet")]
+    [Name("脚部")]
     Feet = 0x0010,
 
-    [Name("Earrings")]
+    [Name("耳环")]
     Ears = 0x0020,
 
-    [Name("Necklace")]
+    [Name("项链")]
     Neck = 0x0040,
 
-    [Name("Bracelets")]
+    [Name("手镯")]
     Wrist = 0x0080,
 
-    [Name("Right Ring")]
+    [Name("右戒指")]
     RFinger = 0x0100,
 
-    [Name("Left Ring")]
+    [Name("左戒指")]
     LFinger = 0x0200,
 
-    [Name("Primary Weapon")]
+    [Name("主手武器")]
     Mainhand = 0x0400,
 
-    [Name("Secondary Weapon")]
+    [Name("副手武器")]
     Offhand = 0x0800,
 
-    [Name("Glasses")]
+    [Name("眼镜")]
     Glasses = 0x1000,
 
-    [Name("Bonus Slot 2")]
+    [Name("额外插槽2")]
     UnkBonus2 = 0x2000,
 }
 
