@@ -221,14 +221,14 @@ public sealed class ObjectIdentification(
         if (key.Length > 0 && actions.TryGetValue(key, out var foundActions) && foundActions.Count > 0)
         {
             foreach (var action in foundActions)
-                set.UpdateCountOrSet($"Action: {action.Name.ExtractTextExtended()}", () => new IdentifiedAction(action));
+                set.UpdateCountOrSet($"技能：{action.Name.ExtractTextExtended()}", () => new IdentifiedAction(action));
             ret = true;
         }
 
         if (fileName.Length > 0 && emotes.TryGetValue(fileName, out var foundEmotes) && foundEmotes.Count > 0)
         {
             foreach (var emote in foundEmotes)
-                set.UpdateCountOrSet($"Emote: {emote.Name.ExtractTextExtended()}", () => new IdentifiedEmote(emote));
+                set.UpdateCountOrSet($"情感动作：{emote.Name.ExtractTextExtended()}", () => new IdentifiedEmote(emote));
             ret = true;
         }
 

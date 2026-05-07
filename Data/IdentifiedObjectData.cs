@@ -290,7 +290,7 @@ public sealed class IdentifiedCounter(int counter = 1) : IIdentifiedObjectData
         => (ChangedItemType.None, 0);
 
     public string ToName(string key)
-        => $"{Counter} Files Manipulating {key}s";
+        => $"{Counter} 个文件正在操作 {key}s";
 
     public string AdditionalData
         => string.Empty;
@@ -298,7 +298,7 @@ public sealed class IdentifiedCounter(int counter = 1) : IIdentifiedObjectData
     public bool FilteredOut(ReadOnlySpan<char> key, ReadOnlySpan<char> filter)
         => !key.Contains(filter, StringComparison.OrdinalIgnoreCase)
          && !Counter.Contains(filter)
-         && !" Files Manipulating".Contains(filter);
+         && !" 个文件正在操作".Contains(filter);
 
     public ChangedItemIcon Icon
         => ChangedItemIcon.Unknown;
