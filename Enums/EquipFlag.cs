@@ -1,4 +1,4 @@
-﻿using Luna.Generators;
+﻿﻿using Luna.Generators;
 
 namespace Penumbra.GameData.Enums;
 
@@ -35,6 +35,7 @@ public enum EquipFlag : uint
 /// <summary> All item slots, including bonus items, as flags. </summary>
 [Flags]
 [NamedEnum("ToLabel", Class: nameof(EquipFlagExtensions))]
+// TODO [Obsolete($"This enum has known design flaws, please use {nameof(ModelCombinedSlots)} instead.")]
 public enum CombinedItemSlotFlag : uint
 {
     [Name("头部")]
