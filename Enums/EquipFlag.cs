@@ -1,5 +1,3 @@
-﻿﻿using Luna.Generators;
-
 namespace Penumbra.GameData.Enums;
 
 /// <summary> Flags for specific parts of equipment pieces. </summary>
@@ -32,62 +30,10 @@ public enum EquipFlag : uint
     OffhandStain  = 0x00800000,
 }
 
-/// <summary> All item slots, including bonus items, as flags. </summary>
-[Flags]
-[NamedEnum("ToLabel", Class: nameof(EquipFlagExtensions))]
-// TODO [Obsolete($"This enum has known design flaws, please use {nameof(ModelCombinedSlots)} instead.")]
-public enum CombinedItemSlotFlag : uint
-{
-    [Name("头部")]
-    Head = 0x0001,
-
-    [Name("身体")]
-    Body = 0x0002,
-
-    [Name("手臂")]
-    Hands = 0x0004,
-
-    [Name("腿部")]
-    Legs = 0x0008,
-
-    [Name("脚部")]
-    Feet = 0x0010,
-
-    [Name("耳环")]
-    Ears = 0x0020,
-
-    [Name("项链")]
-    Neck = 0x0040,
-
-    [Name("手镯")]
-    Wrist = 0x0080,
-
-    [Name("右戒指")]
-    RFinger = 0x0100,
-
-    [Name("左戒指")]
-    LFinger = 0x0200,
-
-    [Name("主手武器")]
-    Mainhand = 0x0400,
-
-    [Name("副手武器")]
-    Offhand = 0x0800,
-
-    [Name("眼镜")]
-    Glasses = 0x1000,
-
-    [Name("额外插槽2")]
-    UnkBonus2 = 0x2000,
-}
-
-public static partial class EquipFlagExtensions
+public static class EquipFlagExtensions
 {
     /// <summary> All equipment flags. </summary>
     public const EquipFlag All = (EquipFlag)(((uint)EquipFlag.OffhandStain << 1) - 1);
-
-    /// <summary> All item slot flags, including bonus items. </summary>
-    public const CombinedItemSlotFlag AllCombined = (CombinedItemSlotFlag)((uint)CombinedItemSlotFlag.UnkBonus2 - 1);
 
     /// <summary> The number of available equipment flags. </summary>
     public const int NumEquipFlags = 24;
@@ -186,16 +132,4 @@ public static partial class EquipFlagExtensions
         };
         return ret;
     }
-
-    public static CombinedItemSlotFlag ToCombinedItemSlotFlag(this EquipFlag flag)
-        => (CombinedItemSlotFlag)((uint)flag & 0xFFF);
-
-    public static CombinedItemSlotFlag StainToCombinedItemSlotFlag(this EquipFlag flag)
-        => (CombinedItemSlotFlag)(((uint)flag >> 12) & 0xFFF);
-
-    public static EquipFlag ToEquipFlag(this CombinedItemSlotFlag flag)
-        => (EquipFlag)((uint)flag & 0xFFF);
-
-    public static EquipFlag ToStainEquipFlag(this CombinedItemSlotFlag flag)
-        => (EquipFlag)(((uint)flag & 0xFFF) << 12);
 }

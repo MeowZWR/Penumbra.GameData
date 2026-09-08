@@ -1,3 +1,4 @@
+using Penumbra.GameData.Interop;
 using Penumbra.GameData.Structs;
 
 namespace Penumbra.GameData.Files.StainMapStructs;
@@ -12,10 +13,13 @@ public record struct DyePack : IDyePack
 
     static string IDyePack.DefaultStmPath => DefaultStmPath;
 
+    static int IDyePack.DefaultStmIndex
+        => StainAccessor.GudStmIndex;
+
     public   HalfColor DiffuseColor;
     public   HalfColor SpecularColor;
     public   HalfColor EmissiveColor;
-    public   Half      Scalar3;
+    public   Half      Exposure;
     public   Half      Metalness;
     public   Half      Roughness;
     public   Half      SheenRate;
