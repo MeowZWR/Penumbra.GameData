@@ -12,6 +12,15 @@ using Penumbra.Api.Preset;
 
 namespace Penumbra.GameData.Gui;
 
+[Flags]
+public enum PenumbraOptionDisplay
+{
+    HideIds       = 0x01,
+    HideAddOption = 0x02,
+    HideResolve   = 0x04,
+    HideIndex     = 0x08,
+}
+
 public static class PresetExtensions
 {
     public delegate IReadOnlyList<(ModObjectIdentifier, bool)>? GetGroupDataDelegate(in ModObjectIdentifier groupIdentifier,
@@ -22,6 +31,28 @@ public static class PresetExtensions
 
     private static readonly EnumCombo<OptionState> OptionStateCombo =
         new(OptionStateExtensions.ToNameU8, OptionStateExtensions.ToName, OptionStateExtensions.Tooltip);
+
+    extension(PenumbraOptionDisplay)
+    {
+        public static bool DrawConfigButton(PenumbraOptionDisplay current, out PenumbraOptionDisplay result)
+        {
+            result = current;
+            if (ImEx.Icon.Button(LunaStyle.ConfigIcon, "Edit the information displayed here."u8) || Im.Item.RightClicked())
+                Im.Popup.Open("##oc"u8);
+
+            Im.Window.SetNextSize(ImEx.ScaledVectorX(250, 4 * Im.Style.FrameHeightWithSpacing + 3 * Im.Style.TextHeightWithSpacing + Im.Style.WindowPadding.Y));
+            using var popup = Im.Popup.Begin("##oc"u8);
+            if (!popup)
+                return false;
+
+            var ret = Im.Checkbox("Hide GUID Input and Buttons"u8, ref result, PenumbraOptionDisplay.HideIds);
+            ret |= Im.Checkbox("Hide Resolved Text and Buttons"u8,   ref result, PenumbraOptionDisplay.HideResolve);
+            ret |= Im.Checkbox("Hide Object Indices"u8,              ref result, PenumbraOptionDisplay.HideIndex);
+            ret |= Im.Checkbox("Hide Sections to Add New Objects"u8, ref result, PenumbraOptionDisplay.HideAddOption);
+            Im.TextWrapped("If GUIDs, Resolved Text and Indices are hidden, Options are displayed in a single line."u8);
+            return ret;
+        }
+    }
 
     extension(SettingPreset preset)
     {
@@ -130,56 +161,44 @@ public static class PresetExtensions
         }
 
         public static bool DrawGroup(Vector2 size, int index, in ModObjectIdentifier group, in ModObjectIdentifier? resolvedGroup,
-            bool disableUnknown, out ModObjectIdentifier? newGroup, out bool? newDisableUnknown)
+            bool disableUnknown, out ModObjectIdentifier? newGroup, out bool? newDisableUnknown, PenumbraOptionDisplay options = default)
         {
             newGroup          = group;
             newDisableUnknown = null;
             var ret = false;
 
-            if (ImEx.GuidInput("##id"u8, group.Identifier == Guid.Empty ? StringU8.Empty : $"{group.Identifier}", out var newGuid,
-                    size.X - Im.Style.ItemInnerSpacing.X - Im.Style.FrameHeight))
+            var showIds     = !options.HasFlag(PenumbraOptionDisplay.HideIds);
+            var showResolve = !options.HasFlag(PenumbraOptionDisplay.HideResolve);
+            var showIndex   = !options.HasFlag(PenumbraOptionDisplay.HideIndex);
+            if (showIds)
+                ret |= DrawGuidInput(size, index, group, ref newGroup, showIndex, true);
+
+            ret |= DrawNameInput(size, group, ref newGroup, 2 + (showIds ? 1 : 0) + (showResolve ? 1 : 0));
+
+            if (showIds)
             {
-                ret      = true;
-                newGroup = group with { Identifier = newGuid };
+                Im.Line.SameInner();
+                if (ImEx.Icon.Button(LunaStyle.TagsMarker, "Remove the name from this group reference and keep only the GUID."u8,
+                        group.Identifier == Guid.Empty)
+                 && group.Name is not null)
+                {
+                    ret      = true;
+                    newGroup = group with { Name = null };
+                }
+            }
+
+            if (showResolve)
+            {
+                Im.Line.SameInner();
+                if (ImEx.Icon.Button(LunaStyle.RefreshIcon, "Update this identifier to the currently resolved group."u8,
+                        !resolvedGroup.HasValue))
+                {
+                    ret      = true;
+                    newGroup = resolvedGroup!.Value;
+                }
             }
 
             Im.Line.SameInner();
-            if (ImEx.Icon.Button(LunaStyle.ResetIcon, "Make this group reference generic by removing the GUID and keeping only the name."u8,
-                    string.IsNullOrEmpty(group.Name) || group.Identifier == Guid.Empty))
-            {
-                ret      = true;
-                newGroup = group with { Identifier = Guid.Empty };
-            }
-
-            Im.Line.SameInner();
-            ImEx.TextFrameAligned($"Group #{index + 1}");
-
-            Im.Item.SetNextWidth(size.X - 4 * (Im.Style.ItemInnerSpacing.X + Im.Style.FrameHeight));
-            if (ImEx.InputOnDeactivation.Text("##name"u8, group.Name ?? string.Empty, out string newName, "Name..."u8))
-            {
-                ret      = true;
-                newGroup = group with { Name = newName };
-            }
-
-            Im.Line.SameInner();
-            if (ImEx.Icon.Button(LunaStyle.TagsMarker, "Remove the name from this group reference and keep only the GUID."u8,
-                    group.Identifier == Guid.Empty)
-             && group.Name is not null)
-            {
-                ret      = true;
-                newGroup = group with { Name = null };
-            }
-
-            Im.Line.SameInner();
-            if (ImEx.Icon.Button(LunaStyle.RefreshIcon, "Update this identifier to the currently resolved group."u8,
-                    !resolvedGroup.HasValue))
-            {
-                ret      = true;
-                newGroup = resolvedGroup!.Value;
-            }
-
-            Im.Line.SameInner();
-
             if (ImEx.Icon.Button(LunaStyle.DeleteIcon, "Delete this group reference entirely from the preset."u8,
                     !LunaStyle.Modifier.Destructive))
             {
@@ -196,12 +215,28 @@ public static class PresetExtensions
 
             Im.Tooltip.OnHover("Disable all unknown options in this group."u8);
 
-            ResolvedText(resolvedGroup);
+            if (!showIds)
+                IndexText(index, group, showIndex, true);
+            ResolvedText(showResolve, resolvedGroup);
             return ret;
         }
 
-        private static void ResolvedText(ModObjectIdentifier? resolved)
+        private static void IndexText(int index, in ModObjectIdentifier @object, bool showIndex, bool group)
         {
+            if (!showIndex)
+                return;
+
+            Im.Line.SameInner();
+            ImEx.TextFrameAligned(group ? $"Group #{index + 1}" : $"Option #{index + 1}");
+            if (@object.Identifier != Guid.Empty)
+                Im.Tooltip.OnHover($"{@object.Identifier}");
+        }
+
+        private static void ResolvedText(bool showResolve, ModObjectIdentifier? resolved)
+        {
+            if (!showResolve)
+                return;
+
             Im.Line.SameInner();
             ImEx.TextFrameAligned("(Resolves to "u8);
             Im.Line.NoSpacing();
@@ -211,8 +246,14 @@ public static class PresetExtensions
         }
 
         public bool DrawAddGroup(Vector2 size, ref Guid guidInput, ref string nameInput, out ModObjectIdentifier identifier,
-            ModObjectIdentifier? resolved)
+            ModObjectIdentifier? resolved, PenumbraOptionDisplay options = default)
         {
+            if (options.HasFlag(PenumbraOptionDisplay.HideAddOption))
+            {
+                identifier = default;
+                return false;
+            }
+
             using var id = Im.Id.Push("newg"u8);
             if (ImEx.GuidInput("##id"u8, guidInput == Guid.Empty ? StringU8.Empty : $"{guidInput}", out var newGuid, size.X))
                 guidInput = newGuid;
@@ -231,7 +272,7 @@ public static class PresetExtensions
                                  "Please enter a valid GUID and/or name to add a group reference to the preset."u8;
             Im.Line.SameInner();
             var ret = ImEx.Icon.Button(LunaStyle.AddObjectIcon, tt, contained || !valid);
-            ResolvedText(resolved);
+            ResolvedText(!options.HasFlag(PenumbraOptionDisplay.HideResolve), resolved);
             if (ret)
             {
                 guidInput = Guid.Empty;
@@ -242,56 +283,44 @@ public static class PresetExtensions
         }
 
         public static bool DrawOption(Vector2 size, int index, in ModObjectIdentifier option, in ModObjectIdentifier? resolvedOption,
-            in OptionState state, out ModObjectIdentifier? newOption, out OptionState? newState)
+            in OptionState state, out ModObjectIdentifier? newOption, out OptionState? newState, PenumbraOptionDisplay options = default)
         {
             newOption = option;
             newState  = null;
             var ret = false;
 
-            if (ImEx.GuidInput("##id"u8, option.Identifier == Guid.Empty ? StringU8.Empty : $"{option.Identifier}", out var newGuid,
-                    size.X - Im.Style.ItemInnerSpacing.X - Im.Style.FrameHeight))
+            var showIds     = !options.HasFlag(PenumbraOptionDisplay.HideIds);
+            var showResolve = !options.HasFlag(PenumbraOptionDisplay.HideResolve);
+            var showIndex   = !options.HasFlag(PenumbraOptionDisplay.HideIndex);
+            if (showIds)
+                ret |= DrawGuidInput(size, index, option, ref newOption, showIndex, false);
+
+            ret |= DrawNameInput(size, option, ref newOption, 1 + (showIds ? 1 : 0) + (showResolve ? 1 : 0));
+
+            if (showIds)
             {
-                ret       = true;
-                newOption = option with { Identifier = newGuid };
+                Im.Line.SameInner();
+                if (ImEx.Icon.Button(LunaStyle.TagsMarker, "Remove the name from this option reference and keep only the GUID."u8,
+                        option.Identifier == Guid.Empty)
+                 && option.Name is not null)
+                {
+                    ret       = true;
+                    newOption = option with { Name = null };
+                }
+            }
+
+            if (showResolve)
+            {
+                Im.Line.SameInner();
+                if (ImEx.Icon.Button(LunaStyle.RefreshIcon, "Update this identifier to the currently resolved option."u8,
+                        !resolvedOption.HasValue))
+                {
+                    ret       = true;
+                    newOption = resolvedOption!.Value;
+                }
             }
 
             Im.Line.SameInner();
-            if (ImEx.Icon.Button(LunaStyle.ResetIcon, "Make this option reference generic by removing the GUID and keeping only the name."u8,
-                    string.IsNullOrEmpty(option.Name) || option.Identifier == Guid.Empty))
-            {
-                ret       = true;
-                newOption = option with { Identifier = Guid.Empty };
-            }
-
-            Im.Line.SameInner();
-            ImEx.TextFrameAligned($"Option #{index + 1}");
-
-            Im.Item.SetNextWidth(size.X - 3 * (Im.Style.ItemInnerSpacing.X + Im.Style.FrameHeight));
-            if (ImEx.InputOnDeactivation.Text("##name"u8, option.Name ?? string.Empty, out string newName, "Name..."u8))
-            {
-                ret       = true;
-                newOption = option with { Name = newName };
-            }
-
-            Im.Line.SameInner();
-            if (ImEx.Icon.Button(LunaStyle.TagsMarker, "Remove the name from this option reference and keep only the GUID."u8,
-                    option.Identifier == Guid.Empty)
-             && option.Name is not null)
-            {
-                ret       = true;
-                newOption = option with { Name = null };
-            }
-
-            Im.Line.SameInner();
-            if (ImEx.Icon.Button(LunaStyle.RefreshIcon, "Update this identifier to the currently resolved option."u8,
-                    !resolvedOption.HasValue))
-            {
-                ret       = true;
-                newOption = resolvedOption!.Value;
-            }
-
-            Im.Line.SameInner();
-
             if (ImEx.Icon.Button(LunaStyle.DeleteIcon, "Delete this option reference entirely from the preset."u8,
                     !LunaStyle.Modifier.Destructive))
             {
@@ -299,21 +328,39 @@ public static class PresetExtensions
                 newOption = null;
             }
 
-            ResolvedText(resolvedOption);
+            if (!showIds)
+                IndexText(index, option, showIndex, false);
+            else
+                ResolvedText(showResolve, resolvedOption);
 
-            if (OptionStateCombo.Draw("##state"u8, state.StringU8, "The state to set this option to inside this group."u8,
+            if (!showIds && !showResolve && !showIndex)
+            {
+                Im.Line.SameInner();
+                size.X = 90 * Im.Style.GlobalScale;
+            }
+
+            if (OptionStateCombo.Draw("##state"u8, state.ToNameU8(), "The state to set this option to inside this group."u8,
                     size.X, out var tmpState))
             {
                 newState = tmpState.Item;
                 ret      = true;
             }
 
+            if (!showIds)
+                ResolvedText(showResolve, resolvedOption);
+
             return ret;
         }
 
         public static bool DrawAddOption(Vector2 size, in GroupSettingData group, ref Guid guidInput, ref string nameInput,
-            out ModObjectIdentifier identifier, ModObjectIdentifier? resolved)
+            out ModObjectIdentifier identifier, ModObjectIdentifier? resolved, PenumbraOptionDisplay options = default)
         {
+            if (options.HasFlag(PenumbraOptionDisplay.HideAddOption))
+            {
+                identifier = default;
+                return false;
+            }
+
             using var id = Im.Id.Push("newo"u8);
             if (ImEx.GuidInput("##id"u8, guidInput == Guid.Empty ? StringU8.Empty : $"{guidInput}", out var newGuid, size.X))
                 guidInput = newGuid;
@@ -332,7 +379,7 @@ public static class PresetExtensions
                                  "Please enter a valid GUID and/or name to add an option reference to the current group."u8;
             Im.Line.SameInner();
             var ret = ImEx.Icon.Button(LunaStyle.AddObjectIcon, tt, contained || !valid);
-            ResolvedText(resolved);
+            ResolvedText(!options.HasFlag(PenumbraOptionDisplay.HideResolve), resolved);
             if (ret)
             {
                 guidInput = Guid.Empty;
@@ -340,6 +387,43 @@ public static class PresetExtensions
             }
 
             return ret;
+        }
+
+        private static bool DrawGuidInput(Vector2 size, int index, in ModObjectIdentifier @object, ref ModObjectIdentifier? newObject,
+            bool showIndex,
+            bool group)
+        {
+            var ret = false;
+            if (ImEx.GuidInput("##id"u8, @object.Identifier == Guid.Empty ? StringU8.Empty : $"{@object.Identifier}", out var newGuid,
+                    size.X - Im.Style.ItemInnerSpacing.X - Im.Style.FrameHeight))
+            {
+                ret       = true;
+                newObject = @object with { Identifier = newGuid };
+            }
+
+            Im.Line.SameInner();
+            if (ImEx.Icon.Button(LunaStyle.ResetIcon,
+                    group
+                        ? "Make this group reference generic by removing the GUID and keeping only the name."u8
+                        : "Make this option reference generic by removing the GUID and keeping only the name."u8,
+                    string.IsNullOrEmpty(@object.Name) || @object.Identifier == Guid.Empty))
+            {
+                ret       = true;
+                newObject = @object with { Identifier = Guid.Empty };
+            }
+
+            IndexText(index, default, showIndex, group);
+            return ret;
+        }
+
+        private static bool DrawNameInput(Vector2 size, in ModObjectIdentifier @object, ref ModObjectIdentifier? newObject, int buttonCount)
+        {
+            Im.Item.SetNextWidth(size.X - buttonCount * (Im.Style.ItemInnerSpacing.X + Im.Style.FrameHeight));
+            if (!ImEx.InputOnDeactivation.Text("##name"u8, @object.Name ?? string.Empty, out string newName, "Name..."u8))
+                return false;
+
+            newObject = @object with { Name = newName };
+            return true;
         }
 
         public void DrawTooltip(bool? currentState, GetGroupDataDelegate data)
