@@ -30,21 +30,26 @@ public sealed class DictEmote(IDalamudPluginInterface pluginInterface, LunaLogge
 
         Parallel.ForEach(sheet.Where(n => n.Name.ByteLength > 0), options, ProcessEmote);
 
-        // Add some specific emotes by known keys.
-        var sit = sheet.GetRow(50);
-        AddEmote("s_pose01_loop.pap", sit);
-        AddEmote("s_pose02_loop.pap", sit);
-        AddEmote("s_pose03_loop.pap", sit);
-        AddEmote("s_pose04_loop.pap", sit);
-        AddEmote("s_pose05_loop.pap", sit);
-
+        // Pose variants selected by index. pose05/pose06, sit.pap and jmn.pap already come from emote timelines.
+        var changePose  = sheet.GetRow(90);
+        var sit         = sheet.GetRow(50);
         var sitOnGround = sheet.GetRow(52);
-        AddEmote("j_pose01_loop.pap", sitOnGround);
-        AddEmote("j_pose02_loop.pap", sitOnGround);
-        AddEmote("j_pose03_loop.pap", sitOnGround);
-        AddEmote("j_pose04_loop.pap", sitOnGround);
+        var doze        = sheet.GetRow(13);
+        for (var fileNumber = 1; fileNumber <= 4; ++fileNumber)
+        {
+            var suffix = fileNumber.ToString("00");
+            AddEmote($"pose{suffix}_loop.pap",        changePose);
+            AddEmote($"pose{suffix}_start.pap",       changePose);
+            AddEmote($"pose{suffix}_center_loop.pap", changePose);
+            AddEmote($"s_pose{suffix}_loop.pap",  sit);
+            AddEmote($"s_pose{suffix}_start.pap", sit);
+            if (fileNumber <= 3)
+            {
+                AddEmote($"j_pose{suffix}_loop.pap",  sitOnGround);
+                AddEmote($"j_pose{suffix}_start.pap", sitOnGround);
+            }
+        }
 
-        var doze = sheet.GetRow(13);
         AddEmote("l_pose01_loop.pap", doze);
         AddEmote("l_pose02_loop.pap", doze);
         AddEmote("l_pose03_loop.pap", doze);

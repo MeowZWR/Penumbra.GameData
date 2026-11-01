@@ -45,7 +45,7 @@ public static class Version
     public const int NameDictsOffset =
         DictCompanionOffset + DictWorldOffset + DictMountOffset + DictOrnamentOffset + DictBNpcOffset + DictENpcOffset - 54;
 
-    public const int DictEmoteOffset = 9;
+    public const int DictEmoteOffset = 12;
     public const int DictEmote       = UsesExtractTextOffset + DictEmoteOffset;
 
     public const int DictModelCharaOffset = -1;

@@ -132,6 +132,14 @@ public static class IdentifiedObjectExtensions
         else
             dict[key] = generate();
     }
+
+    public static void AddEmote(this IDictionary<string, IIdentifiedObjectData> dict, string key, Emote emote, int? pose)
+    {
+        if (dict.TryGetValue(key, out var data) && data is IdentifiedEmote identified)
+            identified.Merge(pose);
+        else
+            dict[key] = new IdentifiedEmote(emote, pose);
+    }
 }
 
 public sealed class IdentifiedItem(EquipItem item, int count = 1) : IIdentifiedObjectData
@@ -359,11 +367,67 @@ public sealed class IdentifiedAction(Action action, int count = 1) : IIdentified
         => ChangedItemIcon.Action;
 }
 
-public sealed class IdentifiedEmote(Emote emote, int count = 1) : IIdentifiedObjectData
+public sealed class IdentifiedEmote(Emote emote, int? pose = null, int count = 1) : IIdentifiedObjectData
 {
+    private const ushort ChairPoses  = 0b1_1111;
+    private const ushort GroundPoses = 0b1111;
+    private const ushort StandPoses  = 0b0111_1110;
+
     public readonly Emote Emote = emote;
 
+    private readonly ushort _fullPoseMask = FullMaskFor(emote.RowId);
+    private          ushort _poseMask     = PoseBit(pose);
+    private          bool   _hasGenericFile = PoseBit(pose) == 0;
+
     public int Count { get; set; } = count;
+
+    public void Merge(int? nextPose)
+    {
+        ++Count;
+        var bit = PoseBit(nextPose);
+        if (bit == 0)
+            _hasGenericFile = true;
+        else
+            _poseMask |= bit;
+    }
+
+    public static bool TryGetPoseIndex(string fileName, out int pose)
+    {
+        pose = -1;
+        if (!fileName.EndsWith(".pap", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var stem = fileName.ToLowerInvariant()[..^4];
+        if (stem.EndsWith("_center_loop"))
+            stem = stem[..^"_center_loop".Length];
+        else if (stem.EndsWith("_loop"))
+            stem = stem[..^"_loop".Length];
+        else if (stem.EndsWith("_start"))
+            stem = stem[..^"_start".Length];
+
+        if (stem is "sit" or "jmn")
+        {
+            pose = 0;
+            return true;
+        }
+
+        var mask = StandPoses;
+        if (stem.Length > 2 && stem[1] == '_' && stem[0] is 's' or 'j' or 'l' or 'b')
+        {
+            mask = stem[0] switch { 's' => ChairPoses, 'j' => GroundPoses, _ => StandPoses };
+            stem = stem[2..];
+        }
+
+        if (stem.Length != 6 || !stem.StartsWith("pose") || stem[4] is < '0' or > '9' || stem[5] is < '0' or > '9')
+            return false;
+
+        var number = (stem[4] - '0') * 10 + (stem[5] - '0');
+        if (number is < 1 or > 6 || (mask & (1 << number)) == 0)
+            return false;
+
+        pose = number;
+        return true;
+    }
 
     public object ToInternalObject()
         => Emote;
@@ -375,11 +439,39 @@ public sealed class IdentifiedEmote(Emote emote, int count = 1) : IIdentifiedObj
         => key;
 
     public string AdditionalData
-        => $"({Emote.RowId})";
+        => FormatPoseSummary() is { Length: > 0 } summary ? $"({Emote.RowId}) {summary}" : $"({Emote.RowId})";
 
     public bool FilteredOut(ReadOnlySpan<char> key, ReadOnlySpan<char> filter)
         => !key.Contains(filter, StringComparison.OrdinalIgnoreCase) && !AdditionalData.Contains(filter);
 
     public ChangedItemIcon Icon
         => ChangedItemIcon.Emote;
+
+    private static ushort FullMaskFor(uint rowId)
+        => rowId switch
+        {
+            50               => ChairPoses,
+            52               => GroundPoses,
+            90 or 218 or 219 => StandPoses,
+            _                => 0,
+        };
+
+    private static ushort PoseBit(int? pose)
+        => pose is >= 0 and <= 6 ? (ushort)(1 << pose.Value) : (ushort)0;
+
+    private string FormatPoseSummary()
+    {
+        if (_poseMask == 0)
+            return string.Empty;
+
+        if (_fullPoseMask != 0 && _poseMask == _fullPoseMask)
+            return _hasGenericFile ? "全部姿势及通用" : "全部姿势";
+
+        var text = "姿势";
+        for (var index = 0; index <= 6; ++index)
+            if ((_poseMask & (1 << index)) != 0)
+                text = text.Length == 2 ? $"{text} {index}" : $"{text}、{index}";
+
+        return _hasGenericFile ? $"{text} 及通用" : text;
+    }
 }

@@ -227,8 +227,17 @@ public sealed class ObjectIdentification(
 
         if (fileName.Length > 0 && emotes.TryGetValue(fileName, out var foundEmotes) && foundEmotes.Count > 0)
         {
+            var pose = IdentifiedEmote.TryGetPoseIndex(fileName, out var poseIndex) ? poseIndex : (int?)null;
+            var seen = foundEmotes.Count > 1 ? new HashSet<string>(foundEmotes.Count) : null;
             foreach (var emote in foundEmotes)
-                set.UpdateCountOrSet($"情感动作：{emote.Name.ExtractTextExtended()}", () => new IdentifiedEmote(emote));
+            {
+                var name = $"情感动作：{emote.Name.ExtractTextExtended()}";
+                if (seen != null && !seen.Add(name))
+                    continue;
+
+                set.AddEmote(name, emote, pose);
+            }
+
             ret = true;
         }
 
