@@ -327,33 +327,103 @@ public class ActorIdentifierFactory(ObjectManager objects, IFramework framework,
 
     #region Verification
 
-    /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<byte> name)
-    {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name);
-    }
+        => name.Length != 0 && (VerifyEnglishPlayerName(name) || VerifyChinesePlayerName(name));
 
-    /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<char> name)
-    {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name.ToString());
-    }
+        => name.Length != 0 && (VerifyEnglishPlayerName(name) || VerifyChinesePlayerName(name));
 
-    /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<byte> name)
+        => name.Length != 0 && (CheckNamePart(name, 3, 20) || VerifyChinesePlayerName(name));
+
+    public static bool VerifyRetainerName(ReadOnlySpan<char> name)
+        => name.Length != 0 && (CheckNamePart(name, 3, 20) || VerifyChinesePlayerName(name));
+
+    private static bool VerifyChinesePlayerName(ReadOnlySpan<byte> nickName)
+        => ChinesePlayerNameRegex.IsMatch(Encoding.UTF8.GetString(nickName));
+
+    private static bool VerifyChinesePlayerName(ReadOnlySpan<char> nickName)
+        => ChinesePlayerNameRegex.IsMatch(nickName);
+
+    private static bool VerifyEnglishPlayerName(ReadOnlySpan<byte> name)
     {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name);
+        if (name.Length is < 5 or > 31)
+            return false;
+
+        var splitIndex = name.IndexOf((byte)' ');
+        if (splitIndex < 0 || name[(splitIndex + 1)..].IndexOf((byte)' ') >= 0)
+            return false;
+
+        return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
     }
 
-    /// <summary> Checks SE naming rules. </summary>
-    public static bool VerifyRetainerName(ReadOnlySpan<char> name)
+    private static bool VerifyEnglishPlayerName(ReadOnlySpan<char> name)
     {
-        if (name.Length == 0) return false;
-        return FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.IsValidPlayerCharacterName(name.ToString());
+        if (name.Length is < 5 or > 31)
+            return false;
+
+        var splitIndex = name.IndexOf(' ');
+        if (splitIndex < 0 || name[(splitIndex + 1)..].IndexOf(' ') >= 0)
+            return false;
+
+        return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
     }
+
+    private static bool CheckNamePart(ReadOnlySpan<char> part, int minLength, int maxLength)
+    {
+        if (part.Length < minLength || part.Length > maxLength)
+            return false;
+
+        if (part[0] is < 'A' or > 'Z')
+            return false;
+
+        var last = '\0';
+        for (var i = 1; i < part.Length; ++i)
+        {
+            var current = part[i];
+            if (current is not ('\'' or '-' or >= 'a' and <= 'z'))
+                return false;
+
+            if (last is '\'' && current is '-')
+                return false;
+            if (last is '-' && current is '-' or '\'')
+                return false;
+
+            last = current;
+        }
+
+        return true;
+    }
+
+    private static bool CheckNamePart(ReadOnlySpan<byte> part, int minLength, int maxLength)
+    {
+        if (part.Length < minLength || part.Length > maxLength)
+            return false;
+
+        if (part[0] is < (byte)'A' or > (byte)'Z')
+            return false;
+
+        var last = (byte)'\0';
+        for (var i = 1; i < part.Length; ++i)
+        {
+            var current = part[i];
+            if (current is not ((byte)'\'' or (byte)'-' or >= (byte)'a' and <= (byte)'z'))
+                return false;
+
+            if (last is (byte)'\'' && current is (byte)'-')
+                return false;
+            if (last is (byte)'-' && current is (byte)'-' or (byte)'\'')
+                return false;
+
+            last = current;
+        }
+
+        return true;
+    }
+
+    private static readonly Regex ChinesePlayerNameRegex = new(
+        @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary> Checks if the world is a valid public world or ushort.MaxValue (any world). </summary>
     public bool VerifyWorld(WorldId worldId)
