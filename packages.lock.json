@@ -86,6 +86,7 @@
       "penumbra.api": {
         "type": "Project",
         "dependencies": {
+          "Luna": "[1.0.0, )",
           "Microsoft.Extensions.Logging": "[9.0.0, )",
           "System.IO.Hashing": "[9.0.8, )"
         }

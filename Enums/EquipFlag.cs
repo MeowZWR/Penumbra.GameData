@@ -1,4 +1,4 @@
-﻿namespace Penumbra.GameData.Enums;
+namespace Penumbra.GameData.Enums;
 
 /// <summary> Flags for specific parts of equipment pieces. </summary>
 [Flags]
